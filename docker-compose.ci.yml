@@ -1,0 +1,5 @@
+version: '3'
+services:
+  main:
+    image: opuscapita/peppol-outbound:dev
+    command: 'gradlew bootRun'
