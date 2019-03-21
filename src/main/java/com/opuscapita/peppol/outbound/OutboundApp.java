@@ -2,7 +2,6 @@ package com.opuscapita.peppol.outbound;
 
 import com.opuscapita.peppol.commons.queue.consume.CommonMessageReceiver;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
-import com.opuscapita.peppol.inbound.module.MessageHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -90,4 +89,5 @@ public class OutboundApp {
             FileUtils.writeByteArrayToFile(file, DatatypeConverter.parseBase64Binary(cert));
         }
     }
+
 }
