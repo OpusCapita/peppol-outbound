@@ -2,6 +2,7 @@ package com.opuscapita.peppol.outbound.sender;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
+import com.opuscapita.peppol.outbound.util.FileUpdateUtils;
 import no.difi.oxalis.api.outbound.TransmissionRequest;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
@@ -9,11 +10,12 @@ import no.difi.oxalis.outbound.transmission.TransmissionRequestBuilder;
 import no.difi.vefa.peppol.common.model.Endpoint;
 import no.difi.vefa.peppol.common.model.ParticipantIdentifier;
 import no.difi.vefa.peppol.common.model.TransportProfile;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -60,18 +62,7 @@ public class TestSender implements Sender {
         InputStream payload = storage.get(cm.getFileName());
         String recipientId = cm.getMetadata().getRecipientId();
 
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(payload))) {
-            String line = reader.readLine();
-            while (line != null) {
-                line = StringUtils.replace(line, recipientId, receiver);
-                result.write(line.getBytes());
-                result.write("\n".getBytes());
-                line = reader.readLine();
-            }
-        }
-
-        return new ByteArrayInputStream(result.toByteArray());
+        return FileUpdateUtils.searchAndReplace(payload, recipientId, receiver);
     }
 
     /**
