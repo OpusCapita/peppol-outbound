@@ -19,6 +19,7 @@ LABEL author="Ibrahim Bilge <Ibrahim.Bilge@opuscapita.com>"
 ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
 
+COPY --from=TEMP_BUILD_IMAGE $APP_HOME/oxalis oxalis
 COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/peppol-outbound.jar .
 
 HEALTHCHECK --interval=15s --timeout=3s --retries=15 \
