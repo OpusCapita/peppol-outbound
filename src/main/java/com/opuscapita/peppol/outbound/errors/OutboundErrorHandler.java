@@ -1,9 +1,6 @@
 package com.opuscapita.peppol.outbound.errors;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
-import com.opuscapita.peppol.commons.container.state.log.DocumentErrorType;
-import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
-import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
 import com.opuscapita.peppol.commons.eventing.TicketReporter;
 import com.opuscapita.peppol.commons.queue.MessageQueue;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +47,7 @@ public class OutboundErrorHandler {
         }
 
         String errorMessage = errorType + ": " + exception.getMessage();
-        cm.getHistory().addLog(new DocumentLog(errorMessage, DocumentLogLevel.ERROR, DocumentErrorType.SENDING_ERROR));
+        cm.getHistory().addSendingError(errorMessage);
 
         if (errorType.requiresNotification()) {
             sendEmailNotification(cm, errorType);

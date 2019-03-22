@@ -8,7 +8,7 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix = "peppol.outbound.errors")
 public class OxalisErrorConfiguration {
-    
+
     private List<OxalisError> list;
 
     public List<OxalisError> getList() {
@@ -17,37 +17,6 @@ public class OxalisErrorConfiguration {
 
     public void setList(List<OxalisError> oxalisErrors) {
         this.list = oxalisErrors;
-    }
-
-    class OxalisError {
-
-        private String mask;
-        private OutboundError type;
-
-        public OxalisError() {
-        }
-
-        public OxalisError(OutboundError type, String mask) {
-            this.type = type;
-            this.mask = mask;
-        }
-
-        public OutboundError getType() {
-            return type;
-        }
-
-        public void setType(OutboundError type) {
-            this.type = type;
-        }
-
-        public String getMask() {
-            return mask;
-        }
-
-        public void setMask(String mask) {
-            this.mask = mask;
-        }
-
     }
 
 }

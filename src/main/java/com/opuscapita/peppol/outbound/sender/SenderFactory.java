@@ -17,10 +17,10 @@ public class SenderFactory {
 
     private final static Logger logger = LoggerFactory.getLogger(SenderFactory.class);
 
-    @Value("${peppol.outbound.sending.enabled:false}")
+    @Value("${sending-enabled:false}")
     private boolean sendingEnabled;
 
-    @Value("${peppol.outbound.test.recipient:}")
+    @Value("${test-recipient:}")
     private String testRecipient;
 
     private Sender fakeSender;

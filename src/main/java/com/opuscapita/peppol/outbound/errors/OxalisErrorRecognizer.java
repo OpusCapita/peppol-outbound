@@ -27,7 +27,7 @@ public class OxalisErrorRecognizer {
 
     private OutboundError recognize(String message) {
         if (errorConfiguration.getList() != null) {
-            for (OxalisErrorConfiguration.OxalisError known : errorConfiguration.getList()) {
+            for (OxalisError known : errorConfiguration.getList()) {
                 logger.debug("Trying " + known.getMask() + " as " + known.getType());
                 if (StringUtils.isNotBlank(known.getMask())) {
                     if (message.replaceAll("\n", " ").replaceAll("\r", " ").matches(known.getMask())) {

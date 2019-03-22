@@ -2,29 +2,29 @@ peppol:
   outbound:
     errors:
       list:
-          # Recipient is not registered in SML
         - type: UNKNOWN_RECIPIENT
           mask: ".*Identifier .* is not registered in SML.*"
 
-          # Doc format for the recipient is not registered in SML
         - type: UNSUPPORTED_DATA_FORMAT
           mask: ".*Combination of receiver.*and document type identifier.*is not supported.*"
 
-          # Data error inside the document (this shouldn't occur for outbound anymore)
         - type: DATA_ERROR
           mask: ".*Your are not allowed to override .* in production mode, makes sure headers match the ones in the document.*"
 
-          # Receiving AP doesn't return 200
         - type: RECEIVING_AP_ERROR
           mask: ".*Request failed with rc=50.*"
+
         - type: RECEIVING_AP_ERROR
           mask: ".*Request failed with rc=40.*"
+
         - type: RECEIVING_AP_ERROR
           mask: ".*Receiving server does not seem to be running.*"
+
         - type: RECEIVING_AP_ERROR
           mask: ".*Possible invalid SSL Certificate at the other end.*"
 
         - type: SECURITY_ERROR
           mask: "Validation of subject principal(CN) failed"
+
         - type: DOCUMENT_ERROR
           mask: "Empty file .* received by .*"
