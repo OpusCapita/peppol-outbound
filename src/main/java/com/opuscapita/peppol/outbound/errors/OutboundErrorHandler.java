@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.outbound.errors;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
+import com.opuscapita.peppol.commons.container.state.Route;
 import com.opuscapita.peppol.commons.eventing.TicketReporter;
 import com.opuscapita.peppol.commons.queue.MessageQueue;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,12 @@ import org.springframework.stereotype.Component;
 public class OutboundErrorHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(OutboundErrorHandler.class);
+
+    @Value("${peppol.outbound.queue.in.name}")
+    private String queueIn;
+
+    @Value("${peppol.outbound.exchange.in.name}")
+    private String retryExchange;
 
     @Value("${peppol.email-sender.queue.in.name}")
     private String emailSenderQueue;
@@ -33,11 +40,12 @@ public class OutboundErrorHandler {
         OutboundError errorType = errorRecognizer.recognize(exception);
 
         if (errorType.isRetryable()) {
-            String retry = cm.popRoute();
-            if (StringUtils.isNotBlank(retry)) {
+            Route route = cm.getRoute();
+            if (route.incrementAndGetCurrent() <= route.getRetry()) {
                 cm.getHistory().addInfo("Sent to outbound retry queue");
                 logger.info("The message " + cm.getFileName() + " sent to retry queue");
-                messageQueue.convertAndSend(retry, cm);
+                String retryQueue = String.format("%s:exchange=%s,x-delay=%d", queueIn, retryExchange, route.getDelay());
+                messageQueue.convertAndSend(retryQueue, cm);
                 return;
             }
 

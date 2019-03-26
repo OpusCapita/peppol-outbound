@@ -44,6 +44,15 @@ public class SenderFactory {
     }
 
     public Sender getSender(ContainerMessage cm) {
+        String destination = cm.getRoute().getDestination();
+        if ("a2a".equals(destination)) {
+            // return a2a sender
+            return null;
+        }
+        if ("xib".equals(destination)) {
+            // return xib sender
+            return null;
+        }
         if (!sendingEnabled) {
             logger.info("Selected to send via FAKE sender for file: " + cm.getFileName());
             return fakeSender;

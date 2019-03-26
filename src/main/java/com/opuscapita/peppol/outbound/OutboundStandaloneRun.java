@@ -6,12 +6,12 @@ import com.opuscapita.peppol.commons.container.metadata.PeppolMessageMetadata;
 import com.opuscapita.peppol.commons.container.state.Endpoint;
 import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +43,7 @@ public class OutboundStandaloneRun implements CommandLineRunner {
         File file = new File(filename);
         InputStream inputStream = new FileInputStream(file);
 
-        Endpoint endpoint = new Endpoint("local", ProcessFlow.OUT, ProcessStep.OUTBOUND);
+        Endpoint endpoint = new Endpoint(Source.UNKNOWN, ProcessFlow.OUT, ProcessStep.OUTBOUND);
         ContainerMessage cm = new ContainerMessage(file.getName(), endpoint);
         cm.getHistory().addInfo("Local received and stored");
 

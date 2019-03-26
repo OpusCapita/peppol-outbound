@@ -46,6 +46,12 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
 
         try {
             Sender sender = senderFactory.getSender(cm);
+
+            // temp, remove this after implementing a2a and xib senders
+            if (sender == null) {
+                return;
+            }
+
             TransmissionResponse response = sender.send(cm);
             cm.setMetadata(PeppolMessageMetadata.create(response));
 
