@@ -37,7 +37,7 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
     @Override
     public void consume(@NotNull ContainerMessage cm) throws Exception {
         cm.setStep(ProcessStep.OUTBOUND);
-        cm.getHistory().addInfo("Received and started to create sending request");
+        cm.getHistory().addInfo("Received and started transmission");
         logger.info("Outbound received the message: " + cm.toKibana());
 
         if (StringUtils.isBlank(cm.getFileName())) {
@@ -55,7 +55,7 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
             TransmissionResponse response = sender.send(cm);
             cm.setMetadata(PeppolMessageMetadata.create(response));
 
-            // set current step to Network
+            cm.setStep(ProcessStep.NETWORK);
             cm.getHistory().addInfo("Successfully delivered to network");
             logger.info("The message " + cm.toKibana() + " successfully delivered to network with transmission ID = " + response.getTransmissionIdentifier());
             logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));

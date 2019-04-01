@@ -3,12 +3,14 @@ package com.opuscapita.peppol.outbound.sender;
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import no.difi.oxalis.api.model.TransmissionIdentifier;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
+import no.difi.vefa.peppol.common.code.DigestMethod;
 import no.difi.vefa.peppol.common.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.x509.X509CertImpl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -48,27 +50,27 @@ public class SomeResponse implements TransmissionResponse {
 
     @Override
     public Date getTimestamp() {
-        return null;
+        return new Date();
     }
 
     @Override
     public Digest getDigest() {
-        return null;
+        return Digest.of(DigestMethod.SHA256, "test".getBytes());
     }
 
     @Override
     public TransportProtocol getTransportProtocol() {
-        return null;
+        return TransportProtocol.AS2;
     }
 
     @Override
     public List<Receipt> getReceipts() {
-        return null;
+        return Arrays.asList(primaryReceipt());
     }
 
     @Override
     public Receipt primaryReceipt() {
-        return null;
+        return Receipt.of("test".getBytes());
     }
 
     @Override
