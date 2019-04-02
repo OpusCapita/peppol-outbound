@@ -2,19 +2,10 @@
   "default": {
     "name": "${serviceName}",
     "log-driver": "gelf",
-    "log-opt": [
-      "gelf-address=udp://${logstash_ip}:12201",
-      "tag=\"${serviceName}\""
-    ],
-    "constraint": [
-      "engine.labels.nodetype==worker"
-    ],
-    "publish": [
-      "mode=host,target=3040,published=3040,protocol=tcp"
-    ],
-    "host": [
-      "consul:172.17.0.1"
-    ],
+    "log-opt": ["gelf-address=udp://${logstash_ip}:12201", "tag=\"${serviceName}\""],
+    "constraint": ["engine.labels.nodetype==worker"],
+    "publish": ["mode=host,target=3040,published=3040,protocol=tcp"],
+    "host": ["consul:172.17.0.1"],
     "env": [
       "SERVICE_NAME=${serviceName}",
       "SERVICE_3040_CHECK_HTTP=/api/health/check",
@@ -22,23 +13,12 @@
       "SERVICE_3040_CHECK_TIMEOUT=3s",
       "RABBITMQ_USER=${SECRET_:env_RABBITMQUSER}",
       "RABBITMQ_PASS=${SECRET_:env_RABBITMQPASS}",
-      "OXALIS_HOME=/run/secrets"
+      "OXALIS_HOME=/usr/app/oxalis"
     ],
     "oc-consul-injection": {
       "redis/password": "${SECRET_:env_REDIS}",
       "mq/user": "${SECRET_:env_RABBITMQUSER}",
       "mq/password": "${SECRET_:env_RABBITMQPASS}"
-    },
-    "oc-secret-injection": {
-      "oxalis-keystore.jks": {
-        "type": "binary",
-        "encoding": "base64",
-        "value": "${SECRET_:env_PEPPOLKEYSTORE}"
-      },
-      "oxalis.conf": {
-        "encoding": "base64",
-        "value": "${OXALIS_CONF}"
-      }
     },
     "oc-service-user-create-override": "true"
   }

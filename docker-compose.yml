@@ -38,9 +38,9 @@ services:
       SERVICE_3306_NAME: mysql
     environment:
       MYSQL_ROOT_PASSWORD: test
-      MYSQL_USER: 'peppol-inbound'
+      MYSQL_USER: 'peppol-monitor'
       MYSQL_PASSWORD: 'test'
-      MYSQL_DATABASE: 'peppol-inbound'
+      MYSQL_DATABASE: 'peppol-monitor'
     depends_on:
       - registrator
 
