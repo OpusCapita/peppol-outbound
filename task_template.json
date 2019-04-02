@@ -13,12 +13,16 @@
       "SERVICE_3040_CHECK_TIMEOUT=3s",
       "RABBITMQ_USER=${SECRET_:env_RABBITMQUSER}",
       "RABBITMQ_PASS=${SECRET_:env_RABBITMQPASS}",
-      "OXALIS_HOME=/usr/app/oxalis"
+      "OXALIS_HOME=/run/secrets"
     ],
     "oc-consul-injection": {
       "redis/password": "${SECRET_:env_REDIS}",
       "mq/user": "${SECRET_:env_RABBITMQUSER}",
       "mq/password": "${SECRET_:env_RABBITMQPASS}"
+    },
+    "oc-secret-injection": {
+      "oxalis-keystore.jks": {"type": "binary", "encoding": "base64", "value": "${SECRET_:env_PEPPOLKEYSTORE}"},
+      "oxalis.conf": {"encoding": "base64", "value": "${OXALIS_CONF}"}
     },
     "oc-service-user-create-override": "true"
   }

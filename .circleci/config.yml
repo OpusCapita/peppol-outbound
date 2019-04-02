@@ -21,8 +21,6 @@ jobs:
           name: "prepare oxalis home directory"
           command: |
               mkdir oxalis
-              echo $OXALIS_CONF | base64 --decode > oxalis/oxalis.conf
-              echo $SECRET_develop_PEPPOLKEYSTORE | base64 --decode > oxalis/oxalis-keystore.jks
               mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy -Dartifact=mysql:mysql-connector-java:5.1.26:jar -DoutputDirectory=oxalis
       - run:
           name: "building and testing locally"
