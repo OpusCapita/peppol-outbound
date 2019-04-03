@@ -26,7 +26,11 @@ public class RealSender implements Sender {
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
         InputStream payload = storage.get(cm.getFileName());
         TransmissionRequest request = oxalis.getTransmissionRequestBuilder().payLoad(payload).build();
-        logger.info("RealSender about to deliver message: " + cm.getFileName() + " to endpoint: " + request.getEndpoint());
+
+        String endpoint = request.getEndpoint().getAddress().toASCIIString();
+        String subject = request.getEndpoint().getCertificate().getSubjectX500Principal().getName();
+        logger.info("RealSender is about to deliver message: " + cm.getFileName() + " to endpoint: " + endpoint + "[" + subject + "]");
+
         return oxalis.getTransmitter().transmit(request);
     }
 

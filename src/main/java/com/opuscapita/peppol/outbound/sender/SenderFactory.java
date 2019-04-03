@@ -54,15 +54,15 @@ public class SenderFactory {
             return null;
         }
         if (!sendingEnabled) {
-            logger.info("Selected to send via FAKE sender for file: " + cm.getFileName());
+            logger.debug("Selected to send via FAKE sender for file: " + cm.getFileName());
             return fakeSender;
         }
         if (StringUtils.isNotBlank(testRecipient)) {
-            logger.info("Selected to send via TEST sender for file: " + cm.getFileName());
+            logger.debug("Selected to send via TEST sender for file: " + cm.getFileName());
             return testSender;
         }
 
-        logger.info("Selected to send via REAL sender for file: " + cm.getFileName());
+        logger.debug("Selected to send via REAL sender for file: " + cm.getFileName());
         return realSender;
     }
 

@@ -54,7 +54,10 @@ public class TestSender implements Sender {
 //        requestBuilder = sendRequestToGivenUrl(requestBuilder, "http://localhost:3037/public/as2");
         TransmissionRequest request = requestBuilder.build();
 
-        logger.info("TestSender about to deliver message: " + cm.getFileName() + " to endpoint: " + request.getEndpoint());
+        String endpoint = request.getEndpoint().getAddress().toASCIIString();
+        String subject = request.getEndpoint().getCertificate().getSubjectX500Principal().getName();
+        logger.info("TestSender is about to deliver message: " + cm.getFileName() + " to endpoint: " + endpoint + "[" + subject + "]");
+
         return oxalis.getTransmitter().transmit(request);
     }
 
