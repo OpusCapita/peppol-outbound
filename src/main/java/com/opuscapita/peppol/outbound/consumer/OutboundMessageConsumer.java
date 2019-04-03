@@ -8,6 +8,7 @@ import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.outbound.errors.OutboundErrorHandler;
 import com.opuscapita.peppol.outbound.sender.Sender;
 import com.opuscapita.peppol.outbound.sender.SenderFactory;
+import com.opuscapita.peppol.outbound.sender.SomeResponse;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -53,12 +54,15 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
             }
 
             TransmissionResponse response = sender.send(cm);
-            cm.setMetadata(PeppolMessageMetadata.create(response));
 
             cm.setStep(ProcessStep.NETWORK);
             cm.getHistory().addInfo("Successfully delivered to network");
             logger.info("The message " + cm.toKibana() + " successfully delivered to network with transmission ID = " + response.getTransmissionIdentifier());
-            logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));
+
+            if (!(response instanceof SomeResponse)) {
+                cm.setMetadata(PeppolMessageMetadata.create(response));
+                logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));
+            }
 
         } catch (Exception exception) {
             cm.getHistory().addInfo("Message delivery failed");
