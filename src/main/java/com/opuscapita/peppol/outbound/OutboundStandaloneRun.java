@@ -43,7 +43,7 @@ public class OutboundStandaloneRun implements CommandLineRunner {
         File file = new File(filename);
         InputStream inputStream = new FileInputStream(file);
 
-        Endpoint endpoint = new Endpoint(Source.UNKNOWN, ProcessFlow.OUT, ProcessStep.OUTBOUND);
+        Endpoint endpoint = new Endpoint(Source.UNKNOWN, ProcessStep.OUTBOUND);
         ContainerMessage cm = new ContainerMessage(file.getName(), endpoint);
         cm.getHistory().addInfo("Local received and stored");
 
