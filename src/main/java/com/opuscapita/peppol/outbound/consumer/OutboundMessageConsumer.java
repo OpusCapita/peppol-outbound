@@ -1,14 +1,12 @@
 package com.opuscapita.peppol.outbound.consumer;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
-import com.opuscapita.peppol.commons.container.metadata.PeppolMessageMetadata;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.eventing.EventReporter;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.outbound.errors.OutboundErrorHandler;
 import com.opuscapita.peppol.outbound.sender.Sender;
 import com.opuscapita.peppol.outbound.sender.SenderFactory;
-import com.opuscapita.peppol.outbound.sender.SomeResponse;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.security.auth.x500.X500Principal;
+import java.security.cert.X509Certificate;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,13 +56,10 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
             TransmissionResponse response = sender.send(cm);
 
             cm.setStep(ProcessStep.NETWORK);
+            updateContainerMessageMetadata(cm, response);
             cm.getHistory().addInfo("Successfully delivered to network");
             logger.info("The message " + cm.toKibana() + " successfully delivered to network with transmission ID = " + response.getTransmissionIdentifier());
-
-            if (!(response instanceof SomeResponse)) {
-                cm.setMetadata(PeppolMessageMetadata.create(response));
-                logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));
-            }
+            logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));
 
         } catch (Exception exception) {
             cm.getHistory().addInfo("Message delivery failed");
@@ -71,6 +68,12 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
         }
 
         eventReporter.reportStatus(cm);
+    }
+
+    private void updateContainerMessageMetadata(ContainerMessage cm, TransmissionResponse response) {
+        X509Certificate certificate = response.getEndpoint().getCertificate();
+        X500Principal principal = certificate.getSubjectX500Principal();
+        cm.getMetadata().setReceivingAccessPoint(principal.getName());
     }
 
 }
