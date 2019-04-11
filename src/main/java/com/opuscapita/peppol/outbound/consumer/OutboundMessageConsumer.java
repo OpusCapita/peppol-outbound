@@ -47,12 +47,12 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
 
         try {
             Sender sender = senderFactory.getSender(cm);
-
             // temp, remove this after implementing a2a and xib senders
             if (sender == null) {
                 return;
             }
 
+            cm.getHistory().addInfo("About to send file using: " + sender.getClass().getSimpleName());
             TransmissionResponse response = sender.send(cm);
 
             cm.setStep(ProcessStep.NETWORK);
