@@ -45,6 +45,12 @@ public class SenderFactory {
 
     public Sender getSender(ContainerMessage cm) {
         String destination = cm.getRoute().getDestination();
+
+        if (!sendingEnabled) {
+            logger.debug("Selected to send via FAKE sender for file: " + cm.getFileName());
+            return fakeSender;
+        }
+
         if ("a2a".equals(destination)) {
             // return a2a sender
             return null;
@@ -53,10 +59,7 @@ public class SenderFactory {
             // return xib sender
             return null;
         }
-        if (!sendingEnabled) {
-            logger.debug("Selected to send via FAKE sender for file: " + cm.getFileName());
-            return fakeSender;
-        }
+
         if (StringUtils.isNotBlank(testRecipient)) {
             logger.debug("Selected to send via TEST sender for file: " + cm.getFileName());
             return testSender;

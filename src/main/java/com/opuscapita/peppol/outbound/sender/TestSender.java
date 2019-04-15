@@ -2,6 +2,7 @@ package com.opuscapita.peppol.outbound.sender;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
+import com.opuscapita.peppol.outbound.sender.fakes.SomeResponse;
 import com.opuscapita.peppol.outbound.util.FileUpdateUtils;
 import no.difi.oxalis.api.outbound.TransmissionRequest;
 import no.difi.oxalis.api.outbound.TransmissionResponse;

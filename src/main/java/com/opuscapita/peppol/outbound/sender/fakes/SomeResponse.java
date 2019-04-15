@@ -1,4 +1,4 @@
-package com.opuscapita.peppol.outbound.sender;
+package com.opuscapita.peppol.outbound.sender.fakes;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import no.difi.oxalis.api.model.TransmissionIdentifier;
@@ -7,7 +7,6 @@ import no.difi.vefa.peppol.common.code.DigestMethod;
 import no.difi.vefa.peppol.common.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.x509.X509CertImpl;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -23,11 +22,11 @@ public class SomeResponse implements TransmissionResponse {
 
     private TransmissionIdentifier identifier;
 
-    SomeResponse() {
+    public SomeResponse() {
         this.identifier = TransmissionIdentifier.generateUUID();
     }
 
-    SomeResponse(String identifier) {
+    public SomeResponse(String identifier) {
         this.identifier = TransmissionIdentifier.of(identifier);
     }
 
@@ -75,7 +74,7 @@ public class SomeResponse implements TransmissionResponse {
 
     @Override
     public Endpoint getEndpoint() {
-        return Endpoint.of(TransportProfile.AS2_1_0, null, new X509CertImpl());
+        return Endpoint.of(TransportProfile.AS2_1_0, null, new SomeCertificate());
     }
 
     /**
