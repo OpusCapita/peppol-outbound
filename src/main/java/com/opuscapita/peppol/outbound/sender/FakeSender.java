@@ -12,7 +12,7 @@ public class FakeSender implements Sender {
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
-        Thread.sleep(5000); // pretend like not fake
+        Thread.sleep(2000); // pretend like not fake
         SomeResponse.throwExceptionIfExpectedInFilename(cm);
 
         logger.info("FakeSender emulated sending, returning some transmission response");
