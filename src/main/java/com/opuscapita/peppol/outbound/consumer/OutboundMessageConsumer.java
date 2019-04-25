@@ -46,7 +46,8 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
         }
 
         try {
-            Sender sender = senderFactory.getSender(cm);
+            String destination = cm.getRoute().getDestination();
+            Sender sender = senderFactory.getSender(cm, destination);
             // temp, remove this after implementing a2a and xib senders
             if (sender == null) {
                 return;
@@ -57,8 +58,8 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
 
             cm.setStep(ProcessStep.NETWORK);
             updateContainerMessageMetadata(cm, response);
-            cm.getHistory().addInfo("Successfully delivered to network");
-            logger.info("The message " + cm.toKibana() + " successfully delivered to network with transmission ID = " + response.getTransmissionIdentifier());
+            cm.getHistory().addInfo("Successfully delivered to " + destination);
+            logger.info("The message " + cm.toKibana() + " successfully delivered to " + destination + " with transmission ID = " + response.getTransmissionIdentifier());
             logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));
 
         } catch (Exception exception) {
@@ -71,6 +72,9 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
     }
 
     private void updateContainerMessageMetadata(ContainerMessage cm, TransmissionResponse response) {
+        if (response.getEndpoint() == null) {
+            return;
+        }
         X509Certificate certificate = response.getEndpoint().getCertificate();
         X500Principal principal = certificate.getSubjectX500Principal();
         cm.getMetadata().setReceivingAccessPoint(principal.getName());

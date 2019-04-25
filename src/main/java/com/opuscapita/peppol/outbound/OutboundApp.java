@@ -75,17 +75,17 @@ public class OutboundApp {
         return new Queue(queueIn);
     }
 
-    @Bean
-    public CustomExchange delayExchange() {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-delayed-type", "direct");
-        return new CustomExchange(retryExchange, "x-delayed-message", true, false, args);
-    }
-
-    @Bean
-    public Binding binding(Queue queue, CustomExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(queueIn).noargs();
-    }
+//    @Bean
+//    public CustomExchange delayExchange() {
+//        Map<String, Object> args = new HashMap<>();
+//        args.put("x-delayed-type", "direct");
+//        return new CustomExchange(retryExchange, "x-delayed-message", true, false, args);
+//    }
+//
+//    @Bean
+//    public Binding binding(Queue queue, CustomExchange exchange) {
+//        return BindingBuilder.bind(queue).to(exchange).with(queueIn).noargs();
+//    }
 
     /**
      * A bit tricky thing, Local build and testing uses docker compose

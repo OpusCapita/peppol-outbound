@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.outbound.errors;
 
+import com.opuscapita.peppol.outbound.sender.business.BusinessDeliveryException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,9 @@ public class OxalisErrorRecognizer {
     public OutboundError recognize(Throwable exception) {
         if (exception.getMessage() == null) {
             return OutboundError.OTHER_ERROR;
+        }
+        if (exception instanceof BusinessDeliveryException) {
+            return OutboundError.BP_DELIVERY_ERROR;
         }
         return recognize(exception.getMessage());
     }

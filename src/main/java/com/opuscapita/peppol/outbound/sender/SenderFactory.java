@@ -2,6 +2,7 @@ package com.opuscapita.peppol.outbound.sender;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
+import com.opuscapita.peppol.outbound.sender.business.XIBSender;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,22 +18,21 @@ public class SenderFactory {
 
     private final static Logger logger = LoggerFactory.getLogger(SenderFactory.class);
 
-    @Value("${sending-enabled:false}")
-    private boolean sendingEnabled;
-
-    @Value("${test-recipient:}")
-    private String testRecipient;
+    @Value("${fake-sending:}")
+    private String fakeConfig;
 
     private Sender fakeSender;
-    private Sender testSender;
     private Sender realSender;
+
+    private XIBSender xibSender;
 
     private Storage storage;
     private OxalisOutboundComponent oxalis;
 
     @Autowired
-    public SenderFactory(Storage storage) {
+    public SenderFactory(Storage storage, XIBSender xibSender) {
         this.storage = storage;
+        this.xibSender = xibSender;
         this.oxalis = new OxalisOutboundComponent();
     }
 
@@ -40,29 +40,24 @@ public class SenderFactory {
     public void initSenders() {
         this.fakeSender = new FakeSender();
         this.realSender = new RealSender(storage, oxalis);
-        this.testSender = new TestSender(testRecipient, storage, oxalis);
+        this.fakeConfig = StringUtils.isBlank(fakeConfig) ? "" : fakeConfig;
     }
 
-    public Sender getSender(ContainerMessage cm) {
-        String destination = cm.getRoute().getDestination();
-
-        if (!sendingEnabled) {
+    public Sender getSender(ContainerMessage cm, String destination) {
+        if (fakeConfig.contains(destination)) {
             logger.debug("Selected to send via FAKE sender for file: " + cm.getFileName());
             return fakeSender;
         }
 
-        if ("a2a".equals(destination)) {
-            // return a2a sender
-            return null;
-        }
         if ("xib".equals(destination)) {
-            // return xib sender
-            return null;
+            logger.debug("Selected to send via XIB sender for file: " + cm.getFileName());
+            return xibSender;
         }
 
-        if (StringUtils.isNotBlank(testRecipient)) {
-            logger.debug("Selected to send via TEST sender for file: " + cm.getFileName());
-            return testSender;
+        if ("a2a".equals(destination)) {
+            logger.debug("Selected to send via A2A sender for file: " + cm.getFileName());
+            // return a2a sender
+            return fakeSender;
         }
 
         logger.debug("Selected to send via REAL sender for file: " + cm.getFileName());

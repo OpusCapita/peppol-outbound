@@ -47,6 +47,11 @@ public enum OutboundError {
     VALIDATION_ERROR(false),
 
     /**
+     * Any exception occurred while delivering to business platforms
+     */
+    BP_DELIVERY_ERROR(false),
+
+    /**
      * All other errors
      */
     OTHER_ERROR(false);
