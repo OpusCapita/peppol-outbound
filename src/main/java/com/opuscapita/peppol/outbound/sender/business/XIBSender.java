@@ -42,6 +42,7 @@ public class XIBSender implements Sender {
             ResponseEntity<String> result = restTemplate.exchange(endpoint, HttpMethod.POST, entity, String.class);
             logger.debug("Upload-file request successfully sent, got response: " + result.toString());
         } catch (Exception e) {
+            logger.error("Error occurred while trying to send the file to XIB", e);
             throw new BusinessDeliveryException("Error occurred while trying to send the file to XIB", e);
         }
 
