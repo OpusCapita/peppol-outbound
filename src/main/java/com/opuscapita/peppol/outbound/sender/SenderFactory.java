@@ -40,7 +40,6 @@ public class SenderFactory {
     public void initSenders() {
         this.fakeSender = new FakeSender();
         this.realSender = new RealSender(storage, oxalis);
-        this.fakeConfig = StringUtils.isBlank(fakeConfig) ? "" : fakeConfig;
     }
 
     public Sender getSender(ContainerMessage cm, String destination) {
