@@ -30,7 +30,7 @@ public class XIBSender implements Sender {
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
         String endpoint = getEndpoint(cm.getFileName());
-        logger.debug("Sending upload-file request to endpoint: " + endpoint + " for file: " + cm.getFileName());
+        logger.info("Sending upload-file request to endpoint: " + endpoint + " for file: " + cm.getFileName());
 
         HttpHeaders headers = new HttpHeaders();
         authService.setAuthorizationHeader(headers);
