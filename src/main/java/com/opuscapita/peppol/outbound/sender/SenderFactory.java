@@ -4,16 +4,17 @@ import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.outbound.sender.business.XIBSender;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 @Component
+@RefreshScope
 public class SenderFactory {
 
     private final static Logger logger = LoggerFactory.getLogger(SenderFactory.class);
