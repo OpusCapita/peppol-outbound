@@ -6,7 +6,7 @@ import com.opuscapita.peppol.outbound.util.FileUpdateUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
@@ -23,8 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 @EnableCaching
 @SpringBootApplication
@@ -33,9 +31,6 @@ public class OutboundApp {
 
     @Value("${peppol.outbound.queue.in.name}")
     private String queueIn;
-
-    @Value("${peppol.outbound.exchange.in.name}")
-    private String retryExchange;
 
     private ContainerMessageConsumer consumer;
 
@@ -74,18 +69,6 @@ public class OutboundApp {
     public Queue queue() {
         return new Queue(queueIn);
     }
-
-//    @Bean
-//    public CustomExchange delayExchange() {
-//        Map<String, Object> args = new HashMap<>();
-//        args.put("x-delayed-type", "direct");
-//        return new CustomExchange(retryExchange, "x-delayed-message", true, false, args);
-//    }
-//
-//    @Bean
-//    public Binding binding(Queue queue, CustomExchange exchange) {
-//        return BindingBuilder.bind(queue).to(exchange).with(queueIn).noargs();
-//    }
 
     /**
      * A bit tricky thing, Local build and testing uses docker compose

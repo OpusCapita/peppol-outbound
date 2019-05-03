@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 @Component
 public class OutboundErrorHandler {
 
@@ -17,9 +20,6 @@ public class OutboundErrorHandler {
 
     @Value("${peppol.outbound.queue.in.name}")
     private String queueIn;
-
-    @Value("${peppol.outbound.exchange.in.name}")
-    private String retryExchange;
 
     @Value("${peppol.email-sender.queue.in.name}")
     private String emailSenderQueue;
@@ -43,8 +43,9 @@ public class OutboundErrorHandler {
             if (route.incrementAndGetCurrent() <= route.getRetry()) {
                 cm.getHistory().addInfo("Sent to outbound retry queue");
                 logger.info("The message " + cm.getFileName() + " sent to retry queue");
-                String retryQueue = String.format("%s:exchange=%s,x-delay=%d", queueIn, retryExchange, route.getDelay());
-                messageQueue.convertAndSend(retryQueue, cm);
+                sendToRetry(cm);
+//                String retryQueue = String.format("%s:exchange=%s,x-delay=%d", queueIn, retryExchange, route.getDelay());
+//                messageQueue.convertAndSend(retryQueue, cm);
                 return;
             }
 
@@ -79,6 +80,18 @@ public class OutboundErrorHandler {
         } catch (Exception weird) {
             logger.error("Reporting to email-notificator threw exception: ", weird);
         }
+    }
+
+    /* temporary solution, need a delayed queue */
+    private void sendToRetry(ContainerMessage cm) {
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000000);
+                messageQueue.convertAndSend(queueIn, cm);
+            } catch (IOException | TimeoutException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 }
