@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -24,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-@EnableCaching
 @SpringBootApplication
 @ComponentScan({"com.opuscapita.peppol.outbound", "com.opuscapita.peppol.commons"})
 public class OutboundApp {
@@ -96,5 +94,4 @@ public class OutboundApp {
             FileUtils.writeByteArrayToFile(file, DatatypeConverter.parseBase64Binary(cert));
         }
     }
-
 }
