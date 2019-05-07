@@ -5,7 +5,13 @@ import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.outbound.util.FileUpdateUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.TrustStrategy;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
@@ -16,16 +22,24 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
+import javax.net.ssl.SSLContext;
 import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
 @SpringBootApplication
 @ComponentScan({"com.opuscapita.peppol.outbound", "com.opuscapita.peppol.commons"})
 public class OutboundApp {
+
+    private final static Logger logger = LoggerFactory.getLogger(OutboundApp.class);
 
     @Value("${peppol.outbound.queue.in.name}")
     private String queueIn;
@@ -66,6 +80,24 @@ public class OutboundApp {
     @Bean
     public Queue queue() {
         return new Queue(queueIn);
+    }
+
+    @Bean
+    // creates ssl validation disabled request factory
+    public HttpComponentsClientHttpRequestFactory requestFactory() {
+        HttpComponentsClientHttpRequestFactory requestFactory = null;
+        try {
+            TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+            SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
+            requestFactory = new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient(httpClient);
+
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            logger.error("Failed to disable SSL Cert Validation for A2A Endpoint", e);
+        }
+        return requestFactory;
     }
 
     /**

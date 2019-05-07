@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySupplier;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
-import java.util.Base64;
 
 @Component
 public class A2ASender implements Sender {
@@ -40,7 +40,10 @@ public class A2ASender implements Sender {
     @Autowired
     public A2ASender(Storage storage, RestTemplateBuilder restTemplateBuilder) {
         this.storage = storage;
-        this.restTemplate = restTemplateBuilder.build();
+        this.restTemplate = restTemplateBuilder
+                .basicAuthentication(username, password)
+                .requestFactory(new ClientHttpRequestFactorySupplier())
+                .build();
     }
 
     @Override
@@ -51,10 +54,6 @@ public class A2ASender implements Sender {
         headers.set("Transfer-Encoding", "chunked");
         headers.set("Document-Path", getDocumentPath(cm));
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-        byte[] basicAuthValue = (username + ":" + password).getBytes();
-        headers.set("Authorization", "Basic " + Base64.getEncoder().encodeToString(basicAuthValue));
-
         HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(cm.getFileName()), headers);
         logger.debug("Wrapped and set the request body as file");
 
