@@ -18,7 +18,10 @@
     "oc-consul-injection": {
       "redis/password": "${SECRET_:env_REDIS}",
       "mq/user": "${SECRET_:env_RABBITMQUSER}",
-      "mq/password": "${SECRET_:env_RABBITMQPASS}"
+      "mq/password": "${SECRET_:env_RABBITMQPASS}",
+      "a2a/host": "${SECRET_:env_A2AHOST}",
+      "a2a/username": "${SECRET_:env_A2AUSERNAME}",
+      "a2a/password": "${SECRET_:env_A2APASSWORD}"
     },
     "oc-secret-injection": {
       "oxalis-keystore.jks": {"type": "binary", "encoding": "base64", "value": "${SECRET_:env_PEPPOLKEYSTORE}"},
