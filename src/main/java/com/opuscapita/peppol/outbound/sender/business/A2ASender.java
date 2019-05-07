@@ -25,13 +25,13 @@ public class A2ASender implements Sender {
 
     private final static Logger logger = LoggerFactory.getLogger(A2ASender.class);
 
-    @Value("${a2a.host}")
+    @Value("${a2a.host:''}")
     private String host;
 
-    @Value("${a2a.username}")
+    @Value("${a2a.username:''}")
     private String username;
 
-    @Value("${a2a.password}")
+    @Value("${a2a.password:''}")
     private String password;
 
     private final Storage storage;
