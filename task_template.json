@@ -22,7 +22,7 @@
     },
     "oc-secret-injection": {
       "oxalis-keystore.jks": {"type": "binary", "encoding": "base64", "value": "${SECRET_:env_PEPPOLKEYSTORE}"},
-      "oxalis.conf": {"encoding": "base64", "value": "${OXALIS_CONF}"}
+      "oxalis.conf": {"encoding": "base64", "value": "${OXALIS_:env_CONF}"}
     },
     "limit-cpu": "0.2",
     "limit-memory": "900M",
