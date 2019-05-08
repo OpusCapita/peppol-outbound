@@ -9,9 +9,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.ClientHttpRequestFactorySupplier;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -19,32 +16,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
-import java.util.Base64;
 
 @Component
 public class A2ASender implements Sender {
 
     private final static Logger logger = LoggerFactory.getLogger(A2ASender.class);
 
-    @Value("${a2a.host:''}")
-    private String host;
-
-    @Value("${a2a.username:''}")
-    private String username;
-
-    @Value("${a2a.password:''}")
-    private String password;
-
     private final Storage storage;
+    private final A2AConfiguration config;
     private final RestTemplate restTemplate;
 
     @Autowired
-    public A2ASender(Storage storage, RestTemplateBuilder restTemplateBuilder) {
+    public A2ASender(Storage storage, RestTemplate restTemplate, A2AConfiguration config) {
+        this.config = config;
         this.storage = storage;
-        this.restTemplate = restTemplateBuilder
-                .requestFactory(new ClientHttpRequestFactorySupplier())
-                .build();
-        logger.info("Username: " + username);
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -55,16 +41,12 @@ public class A2ASender implements Sender {
         headers.set("Transfer-Encoding", "chunked");
         headers.set("Document-Path", getDocumentPath(cm));
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-
-        logger.info("Username: " + username);
-        byte[] basicAuthValue = (username + ":" + password).getBytes();
-        headers.set("Authorization", "Basic " + Base64.getEncoder().encodeToString(basicAuthValue));
-
+        headers.set("Authorization", config.getAuthHeader());
         HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(cm.getFileName()), headers);
         logger.debug("Wrapped and set the request body as file");
 
         try {
-            ResponseEntity<String> result = restTemplate.exchange(host, HttpMethod.POST, entity, String.class);
+            ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
             logger.debug("File successfully sent to A2A, got response: " + result.toString());
         } catch (Exception e) {
             logger.error("Error occurred while trying to send the file to A2A", e);
@@ -93,5 +75,4 @@ public class A2ASender implements Sender {
         String filename = FilenameUtils.getName(cm.getFileName());
         return String.format("/%s/%s/%s", archetype, type, filename);
     }
-
 }
