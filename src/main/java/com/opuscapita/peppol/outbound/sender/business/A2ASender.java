@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
+import java.util.Base64;
 
 @Component
 public class A2ASender implements Sender {
@@ -41,9 +42,9 @@ public class A2ASender implements Sender {
     public A2ASender(Storage storage, RestTemplateBuilder restTemplateBuilder) {
         this.storage = storage;
         this.restTemplate = restTemplateBuilder
-                .basicAuthentication(username, password)
                 .requestFactory(new ClientHttpRequestFactorySupplier())
                 .build();
+        logger.info("Username: " + username);
     }
 
     @Override
@@ -54,6 +55,11 @@ public class A2ASender implements Sender {
         headers.set("Transfer-Encoding", "chunked");
         headers.set("Document-Path", getDocumentPath(cm));
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        logger.info("Username: " + username);
+        byte[] basicAuthValue = (username + ":" + password).getBytes();
+        headers.set("Authorization", "Basic " + Base64.getEncoder().encodeToString(basicAuthValue));
+
         HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(cm.getFileName()), headers);
         logger.debug("Wrapped and set the request body as file");
 
