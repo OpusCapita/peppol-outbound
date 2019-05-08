@@ -2,6 +2,7 @@ package com.opuscapita.peppol.outbound.sender;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
+import com.opuscapita.peppol.outbound.sender.business.A2ASender;
 import com.opuscapita.peppol.outbound.sender.business.XIBSender;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
 import org.slf4j.Logger;
@@ -25,14 +26,16 @@ public class SenderFactory {
     private Sender fakeSender;
     private Sender realSender;
 
+    private A2ASender a2aSender;
     private XIBSender xibSender;
 
     private Storage storage;
     private OxalisOutboundComponent oxalis;
 
     @Autowired
-    public SenderFactory(Storage storage, XIBSender xibSender) {
+    public SenderFactory(Storage storage, A2ASender a2aSender, XIBSender xibSender) {
         this.storage = storage;
+        this.a2aSender = a2aSender;
         this.xibSender = xibSender;
         this.oxalis = new OxalisOutboundComponent();
     }
@@ -56,8 +59,7 @@ public class SenderFactory {
 
         if ("a2a".equals(destination)) {
             logger.debug("Selected to send via A2A sender for file: " + cm.getFileName());
-            // return a2a sender
-            return fakeSender;
+            return a2aSender;
         }
 
         logger.debug("Selected to send via REAL sender for file: " + cm.getFileName());
