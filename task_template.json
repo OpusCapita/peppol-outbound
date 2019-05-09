@@ -27,10 +27,10 @@
       "oxalis-keystore.jks": {"type": "binary", "encoding": "base64", "value": "${SECRET_:env_PEPPOLKEYSTORE}"},
       "oxalis.conf": {"encoding": "base64", "value": "${OXALIS_:env_CONF}"}
     },
-    "limit-cpu": "0.2",
+    "limit-cpu": "0.3",
     "limit-memory": "900M",
-    "reserve-cpu": "0.1",
-    "reserve-memory": "500M",
+    "reserve-cpu": "0.15",
+    "reserve-memory": "300M",
     "oc-service-user-create-override": "true"
   }
 }
