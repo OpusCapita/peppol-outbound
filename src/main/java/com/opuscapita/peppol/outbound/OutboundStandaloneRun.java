@@ -8,7 +8,9 @@ import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
+import com.opuscapita.peppol.commons.storage.StorageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 
 import java.io.File;
@@ -19,6 +21,9 @@ import java.io.InputStream;
 public class OutboundStandaloneRun implements CommandLineRunner {
 
     private static final String filename = "C:\\artifacts\\test\\peppol-bis.xml";
+
+    @Value("${peppol.storage.blob.hot:hot}")
+    private String hotFolder;
 
     private Storage storage;
     private MetadataExtractor extractor;
@@ -41,7 +46,7 @@ public class OutboundStandaloneRun implements CommandLineRunner {
         File file = new File(filename);
         InputStream inputStream = new FileInputStream(file);
 
-        ContainerMessage cm = new ContainerMessage(file.getName(), Source.UNKNOWN, ProcessStep.OUTBOUND);
+        ContainerMessage cm = new ContainerMessage(file.getName(), Source.A2A, ProcessStep.OUTBOUND);
         cm.getHistory().addInfo("Local received and stored");
 
         ContainerMessageMetadata metadata = extractor.extract(inputStream);
@@ -54,7 +59,8 @@ public class OutboundStandaloneRun implements CommandLineRunner {
     }
 
     private String storeFile(ContainerMessage cm, InputStream inputStream) throws StorageException {
-        return storage.putToPermanent(inputStream, cm.getFileName(), cm.getMetadata().getSenderId(), cm.getMetadata().getRecipientId());
+        String path = hotFolder + StorageUtils.FILE_SEPARATOR + cm.getSource().name().toLowerCase();
+        path = StorageUtils.createDailyPath(path, "");
+        return storage.put(inputStream, path, cm.getFileName());
     }
-
 }
