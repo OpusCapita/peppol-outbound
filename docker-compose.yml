@@ -24,8 +24,8 @@ services:
       RABBITMQ_USER: ${SECRET_develop_RABBITMQUSER}
       RABBITMQ_PASS: ${SECRET_develop_RABBITMQPASS}
       OXALIS_HOME: /usr/app/oxalis
-      OXALIS_CONF: ${OXALIS_develop_CONF}
-      OXALIS_CERT: ${SECRET_develop_PEPPOLKEYSTORE}
+      OXALIS_CONF: ${PEPPOL_develop_OXALIS}
+      OXALIS_CERT: ${PEPPOL_develop_KEYSTORE}
     ports:
      - '3040:3040'
 
