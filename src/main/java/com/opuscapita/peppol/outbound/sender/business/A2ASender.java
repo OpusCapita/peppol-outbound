@@ -71,6 +71,7 @@ public class A2ASender implements Sender {
         }
 
         String archetype = cm.getMetadata().getValidationRule().getArchetype();
+        archetype = "CENBII".equals(archetype) ? "PEPPOL_BIS" : archetype; // just in case
         String type = cm.getMetadata().getValidationRule().getLocalName();
         String filename = FilenameUtils.getName(cm.getFileName());
         return String.format("/%s/%s/%s", archetype, type, filename);
