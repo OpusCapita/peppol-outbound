@@ -57,9 +57,9 @@ public class OutboundErrorHandler {
         String errorMessage = errorType + ": " + exception.getMessage();
         cm.getHistory().addSendingError(errorMessage);
 
-        if (errorType.requiresNotification()) {
-            sendEmailNotification(cm, errorType);
-        }
+//        if (errorType.requiresNotification()) {
+//            sendEmailNotification(cm, errorType);
+//        }
         if (errorType.requiresTicketCreation()) {
             createSNCTicket(cm, exception, errorMessage);
         }
@@ -93,5 +93,4 @@ public class OutboundErrorHandler {
             }
         }).start();
     }
-
 }
