@@ -40,5 +40,9 @@
     "reserve-cpu": "0.15",
     "reserve-memory": "300M",
     "oc-service-user-create-override": "true"
+  },
+  "prod": {
+    "limit-cpu": "0.5",
+    "limit-memory": "1200M"
   }
 }
