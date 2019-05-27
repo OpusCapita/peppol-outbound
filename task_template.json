@@ -43,6 +43,6 @@
   },
   "prod": {
     "limit-cpu": "0.5",
-    "limit-memory": "1200M"
+    "limit-memory": "2000M"
   }
 }
