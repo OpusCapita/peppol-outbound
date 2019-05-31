@@ -23,8 +23,14 @@ peppol:
         - type: RECEIVING_AP_ERROR
           mask: ".*Possible invalid SSL Certificate at the other end.*"
 
+        - type: RECEIVING_AP_ERROR
+          mask: ".*Transmission failed to endpoint.*"
+
         - type: SECURITY_ERROR
           mask: "Validation of subject principal(CN) failed"
+
+        - type: INTERNAL_SERVICE_ERROR
+          mask: ".*Error occurred while trying to .* from blob service.*"
 
         - type: DOCUMENT_ERROR
           mask: "Empty file .* received by .*"
