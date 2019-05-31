@@ -49,7 +49,12 @@ public enum OutboundError {
     /**
      * Any exception occurred while delivering to business platforms
      */
-    BP_DELIVERY_ERROR(false),
+    BP_DELIVERY_ERROR(true),
+
+    /**
+     * An unexpected error occurred in our own service, probably from blob
+     */
+    INTERNAL_SERVICE_ERROR(true),
 
     /**
      * All other errors
@@ -77,6 +82,8 @@ public enum OutboundError {
         return OutboundError.OTHER_ERROR.equals(this) ||
                 OutboundError.SECURITY_ERROR.equals(this) ||
                 OutboundError.CONNECTION_ERROR.equals(this) ||
+                OutboundError.BP_DELIVERY_ERROR.equals(this) ||
+                OutboundError.INTERNAL_SERVICE_ERROR.equals(this) ||
                 OutboundError.RECEIVING_AP_ERROR.equals(this);
     }
 
