@@ -21,9 +21,6 @@ public class OutboundErrorHandler {
     @Value("${peppol.outbound.queue.in.name}")
     private String queueIn;
 
-    @Value("${peppol.email-sender.queue.in.name}")
-    private String emailSenderQueue;
-
     private final MessageQueue messageQueue;
     private final TicketReporter ticketReporter;
     private final OxalisErrorRecognizer errorRecognizer;
@@ -35,7 +32,7 @@ public class OutboundErrorHandler {
         this.errorRecognizer = errorRecognizer;
     }
 
-    public void handle(ContainerMessage cm, Exception exception) throws Exception {
+    public void handle(ContainerMessage cm, Exception exception) {
         OutboundError errorType = errorRecognizer.recognize(exception);
 
         if (errorType.isRetryable()) {
@@ -57,9 +54,6 @@ public class OutboundErrorHandler {
         String errorMessage = errorType + ": " + exception.getMessage();
         cm.getHistory().addSendingError(errorMessage);
 
-//        if (errorType.requiresNotification()) {
-//            sendEmailNotification(cm, errorType);
-//        }
         if (errorType.requiresTicketCreation()) {
             createSNCTicket(cm, exception, errorMessage);
         }
@@ -70,15 +64,6 @@ public class OutboundErrorHandler {
             ticketReporter.reportWithContainerMessage(cm, e, errorMessage);
         } catch (Exception weird) {
             logger.error("Reporting to ServiceNow threw exception: ", weird);
-        }
-    }
-
-    private void sendEmailNotification(ContainerMessage cm, OutboundError errorType) {
-        try {
-            logger.info("Sending message to email notificator since error: " + errorType + " requires notification");
-            messageQueue.convertAndSend(emailSenderQueue, cm);
-        } catch (Exception weird) {
-            logger.error("Reporting to email-notificator threw exception: ", weird);
         }
     }
 
