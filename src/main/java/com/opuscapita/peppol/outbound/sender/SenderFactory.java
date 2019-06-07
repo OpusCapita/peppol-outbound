@@ -48,21 +48,21 @@ public class SenderFactory {
 
     public Sender getSender(ContainerMessage cm, String destination) {
         if (fakeConfig.contains(destination)) {
-            logger.debug("Selected to send via FAKE sender for file: " + cm.getFileName());
+            logger.info("Selected to send via FAKE sender for file: " + cm.getFileName());
             return fakeSender;
         }
 
         if ("xib".equals(destination)) {
-            logger.debug("Selected to send via XIB sender for file: " + cm.getFileName());
+            logger.info("Selected to send via XIB sender for file: " + cm.getFileName());
             return xibSender;
         }
 
         if ("a2a".equals(destination)) {
-            logger.debug("Selected to send via A2A sender for file: " + cm.getFileName());
+            logger.info("Selected to send via A2A sender for file: " + cm.getFileName());
             return a2aSender;
         }
 
-        logger.debug("Selected to send via REAL sender for file: " + cm.getFileName());
+        logger.info("Selected to send via REAL sender for file: " + cm.getFileName());
         return realSender;
     }
 
