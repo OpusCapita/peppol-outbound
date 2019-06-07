@@ -5,6 +5,7 @@ import com.opuscapita.peppol.commons.storage.Storage;
 import no.difi.oxalis.api.outbound.TransmissionRequest;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
+import no.difi.oxalis.outbound.transmission.TransmissionRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +26,12 @@ public class RealSender implements Sender {
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
         logger.info("RealSender.send called for the message: " + cm.getFileName());
-        InputStream payload = storage.get(cm.getFileName());
-        logger.info("RealSender read the message payload from blob: " + cm.getFileName());
-        TransmissionRequest request = oxalis.getTransmissionRequestBuilder().payLoad(payload).build();
+
+        TransmissionRequestBuilder requestBuilder = oxalis.getTransmissionRequestBuilder();
+        try (InputStream payload = storage.get(cm.getFileName())) {
+            requestBuilder.payLoad(payload);
+        }
+        TransmissionRequest request = requestBuilder.build();
         logger.info("RealSender created request for the message: " + cm.getFileName());
 
         String endpoint = request.getEndpoint().getAddress().toASCIIString();
