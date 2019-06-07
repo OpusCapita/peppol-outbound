@@ -24,8 +24,11 @@ public class RealSender implements Sender {
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
+        logger.info("RealSender.send called for the message: " + cm.getFileName());
         InputStream payload = storage.get(cm.getFileName());
+        logger.info("RealSender read the message payload from blob: " + cm.getFileName());
         TransmissionRequest request = oxalis.getTransmissionRequestBuilder().payLoad(payload).build();
+        logger.info("RealSender created request for the message: " + cm.getFileName());
 
         String endpoint = request.getEndpoint().getAddress().toASCIIString();
         String subject = request.getEndpoint().getCertificate().getSubjectX500Principal().getName();

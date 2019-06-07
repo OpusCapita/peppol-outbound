@@ -35,7 +35,7 @@ public class A2ASender implements Sender {
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
-        logger.debug("Sending A2A outbound request for file: " + cm.getFileName());
+        logger.info("A2ASender.send called for the message: " + cm.getFileName());
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Transfer-Encoding", "chunked");
@@ -43,7 +43,7 @@ public class A2ASender implements Sender {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.set("Authorization", config.getAuthHeader());
         HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(cm.getFileName()), headers);
-        logger.debug("Wrapped and set the request body as file");
+        logger.info("A2ASender wrapped and set the request body for the message: " + cm.getFileName());
 
         try {
             ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
