@@ -45,11 +45,13 @@ public class A2ASender implements Sender {
             HttpEntity<Resource> entity = new HttpEntity<>(new InputStreamResource(content), headers);
             logger.debug("A2ASender wrapped and set the request body for the message: " + cm.getFileName());
 
-            ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
-            logger.info("File successfully sent to A2A, got response: " + result.toString());
-        } catch (Exception e) {
-            logger.error("Error occurred while trying to send the file to A2A", e);
-            throw new BusinessDeliveryException("Error occurred while trying to send the file to A2A", e);
+            try {
+                ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
+                logger.info("File successfully sent to A2A, got response: " + result.toString());
+            } catch (Exception e) {
+                logger.error("Error occurred while trying to send the file to A2A", e);
+                throw new BusinessDeliveryException("Error occurred while trying to send the file to A2A", e);
+            }
         }
 
         return new BusinessResponse();
