@@ -53,7 +53,6 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
             cm.getHistory().addInfo("About to send file using: " + sender.getClass().getSimpleName());
             TransmissionResponse response = sender.send(cm);
 
-            logger.info("Message delivered, setting metadata: " + cm.getFileName());
             cm.setStep(ProcessStep.NETWORK);
             updateContainerMessageMetadata(cm, response);
             cm.getHistory().addInfo("Successfully delivered to " + destination);

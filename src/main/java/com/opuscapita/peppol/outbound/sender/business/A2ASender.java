@@ -2,7 +2,6 @@ package com.opuscapita.peppol.outbound.sender.business;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
-import com.opuscapita.peppol.commons.storage.StorageException;
 import com.opuscapita.peppol.outbound.sender.Sender;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.apache.commons.io.FilenameUtils;
@@ -35,31 +34,25 @@ public class A2ASender implements Sender {
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
-        logger.info("A2ASender.send called for the message: " + cm.getFileName());
+        logger.debug("A2ASender.send called for the message: " + cm.getFileName());
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Transfer-Encoding", "chunked");
-        headers.set("Document-Path", getDocumentPath(cm));
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.set("Authorization", config.getAuthHeader());
-        HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(cm.getFileName()), headers);
-        logger.info("A2ASender wrapped and set the request body for the message: " + cm.getFileName());
+        try (InputStream content = storage.get(cm.getFileName())) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Transfer-Encoding", "chunked");
+            headers.set("Document-Path", getDocumentPath(cm));
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.set("Authorization", config.getAuthHeader());
+            HttpEntity<Resource> entity = new HttpEntity<>(new InputStreamResource(content), headers);
+            logger.debug("A2ASender wrapped and set the request body for the message: " + cm.getFileName());
 
-        try {
             ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
-            logger.debug("File successfully sent to A2A, got response: " + result.toString());
+            logger.info("File successfully sent to A2A, got response: " + result.toString());
         } catch (Exception e) {
             logger.error("Error occurred while trying to send the file to A2A", e);
             throw new BusinessDeliveryException("Error occurred while trying to send the file to A2A", e);
         }
 
-        logger.info("A2ASender delivered message: " + cm.getFileName());
         return new BusinessResponse();
-    }
-
-    private InputStreamResource getFileContent(String filename) throws StorageException {
-        InputStream content = storage.get(filename);
-        return new InputStreamResource(content);
     }
 
     private String getDocumentPath(ContainerMessage cm) {
@@ -76,4 +69,5 @@ public class A2ASender implements Sender {
         String filename = FilenameUtils.getName(cm.getFileName());
         return String.format("/%s/%s/%s", archetype, type, filename);
     }
+
 }
