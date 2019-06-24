@@ -34,7 +34,28 @@ public class A2ASender implements Sender {
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
-        logger.debug("A2ASender.send called for the message: " + cm.getFileName());
+        logger.info("A2ASender.send called for the message: " + cm.getFileName());
+
+        int i = 0;
+        Exception t;
+        do {
+            try {
+                sendRequest(cm);
+                return new BusinessResponse();
+            } catch (Exception e) {
+                t = e;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        } while (++i < 5);
+
+        throw t;
+    }
+
+    private void sendRequest(ContainerMessage cm) throws Exception {
+        logger.info("A2ASender.sendRequest called for the message: " + cm.getFileName());
 
         try (InputStream content = storage.get(cm.getFileName())) {
             HttpHeaders headers = new HttpHeaders();
@@ -43,7 +64,7 @@ public class A2ASender implements Sender {
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             headers.set("Authorization", config.getAuthHeader());
             HttpEntity<Resource> entity = new HttpEntity<>(new InputStreamResource(content), headers);
-            logger.debug("A2ASender wrapped and set the request body for the message: " + cm.getFileName());
+            logger.info("A2ASender wrapped and set the request body for the message: " + cm.getFileName());
 
             try {
                 ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
@@ -53,8 +74,6 @@ public class A2ASender implements Sender {
                 throw new BusinessDeliveryException("Error occurred while trying to send the file to A2A", e);
             }
         }
-
-        return new BusinessResponse();
     }
 
     private String getDocumentPath(ContainerMessage cm) {

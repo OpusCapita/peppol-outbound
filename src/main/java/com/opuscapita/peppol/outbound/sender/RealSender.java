@@ -25,14 +25,14 @@ public class RealSender implements Sender {
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
-        logger.info("RealSender.send called for the message: " + cm.getFileName());
+        logger.debug("RealSender.send called for the message: " + cm.getFileName());
 
         TransmissionRequestBuilder requestBuilder = oxalis.getTransmissionRequestBuilder();
         try (InputStream payload = storage.get(cm.getFileName())) {
             requestBuilder.payLoad(payload);
         }
         TransmissionRequest request = requestBuilder.build();
-        logger.info("RealSender created request for the message: " + cm.getFileName());
+        logger.debug("RealSender created request for the message: " + cm.getFileName());
 
         String endpoint = request.getEndpoint().getAddress().toASCIIString();
         String subject = request.getEndpoint().getCertificate().getSubjectX500Principal().getName();
