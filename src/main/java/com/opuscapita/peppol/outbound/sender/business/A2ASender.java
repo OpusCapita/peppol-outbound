@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -26,7 +27,7 @@ public class A2ASender implements Sender {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public A2ASender(Storage storage, RestTemplate restTemplate, A2AConfiguration config) {
+    public A2ASender(Storage storage, @Qualifier("a2aRestTemplate") RestTemplate restTemplate, A2AConfiguration config) {
         this.config = config;
         this.storage = storage;
         this.restTemplate = restTemplate;
