@@ -40,7 +40,7 @@ public class OutboundErrorHandler {
             if (route.incrementAndGetCurrent() <= route.getRetry()) {
                 cm.getHistory().addInfo("Sent to outbound retry queue");
                 logger.info("The message " + cm.getFileName() + " sent to retry queue");
-                sendToRetry(cm);
+                sendToRetry(cm, route.getDelay());
 //                String retryQueue = String.format("%s:exchange=%s,x-delay=%d", queueIn, retryExchange, route.getDelay());
 //                messageQueue.convertAndSend(retryQueue, cm);
                 return;
@@ -68,10 +68,10 @@ public class OutboundErrorHandler {
     }
 
     /* temporary solution, need a delayed queue */
-    private void sendToRetry(ContainerMessage cm) {
+    private void sendToRetry(ContainerMessage cm, int delay) {
         new Thread(() -> {
             try {
-                Thread.sleep(1000000);
+                Thread.sleep(delay);
                 messageQueue.convertAndSend(queueIn, cm);
             } catch (IOException | TimeoutException | InterruptedException e) {
                 e.printStackTrace();

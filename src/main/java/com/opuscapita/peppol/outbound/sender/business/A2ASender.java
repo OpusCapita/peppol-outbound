@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.outbound.sender.business;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
+import com.opuscapita.peppol.commons.queue.RetryOperation;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.outbound.sender.Sender;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
@@ -36,23 +37,8 @@ public class A2ASender implements Sender {
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
         logger.info("A2ASender.send called for the message: " + cm.getFileName());
-
-        int i = 0;
-        Exception t;
-        do {
-            try {
-                sendRequest(cm);
-                return new BusinessResponse();
-            } catch (Exception e) {
-                t = e;
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored) {
-                }
-            }
-        } while (++i < 5);
-
-        throw t;
+        RetryOperation.start(() -> sendRequest(cm));
+        return new BusinessResponse();
     }
 
     private void sendRequest(ContainerMessage cm) throws Exception {
