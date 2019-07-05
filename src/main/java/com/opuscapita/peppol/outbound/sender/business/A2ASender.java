@@ -57,7 +57,7 @@ public class A2ASender implements Sender {
                 ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
                 logger.info("File successfully sent to A2A, got response: " + result.toString());
             } catch (Exception e) {
-                logger.error("Error occurred while trying to send the file to A2A", e);
+                logger.error("Error occurred while trying to send the file to A2A: " + e.getMessage());
                 throw new BusinessDeliveryException("Error occurred while trying to send the file to A2A", e);
             }
         }
