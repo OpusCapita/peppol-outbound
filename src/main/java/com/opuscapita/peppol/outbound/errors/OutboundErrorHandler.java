@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Component
@@ -41,8 +44,6 @@ public class OutboundErrorHandler {
                 cm.getHistory().addInfo("Sent to outbound retry queue");
                 logger.info("The message " + cm.getFileName() + " sent to retry queue");
                 sendToRetry(cm, route.getDelay());
-//                String retryQueue = String.format("%s:exchange=%s,x-delay=%d", queueIn, retryExchange, route.getDelay());
-//                messageQueue.convertAndSend(retryQueue, cm);
                 return;
             }
 
@@ -69,13 +70,15 @@ public class OutboundErrorHandler {
 
     /* temporary solution, need a delayed queue */
     private void sendToRetry(ContainerMessage cm, int delay) {
-        new Thread(() -> {
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.schedule(() -> {
+
             try {
-                Thread.sleep(delay);
                 messageQueue.convertAndSend(queueIn, cm);
-            } catch (IOException | TimeoutException | InterruptedException e) {
+            } catch (IOException | TimeoutException e) {
                 e.printStackTrace();
             }
-        }).start();
+
+        }, delay, TimeUnit.MILLISECONDS);
     }
 }
