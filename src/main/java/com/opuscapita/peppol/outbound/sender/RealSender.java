@@ -38,6 +38,7 @@ public class RealSender implements Sender {
         String subject = request.getEndpoint().getCertificate().getSubjectX500Principal().getName();
         logger.info("RealSender is about to deliver message: " + cm.getFileName() + " to endpoint: " + endpoint + " [" + subject + "]");
 
+        cm.getMetadata().setReceivingAccessPoint(subject);
         return oxalis.getTransmitter().transmit(request);
     }
 

@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.security.auth.x500.X500Principal;
-import java.security.cert.X509Certificate;
 import java.util.stream.Collectors;
 
 @Component
@@ -54,7 +52,6 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
             TransmissionResponse response = sender.send(cm);
 
             cm.setStep(ProcessStep.NETWORK);
-            updateContainerMessageMetadata(cm, response);
             cm.getHistory().addInfo("Successfully delivered to " + destination);
             logger.info("The message " + cm.toKibana() + " successfully delivered to " + destination + " with transmission ID = " + response.getTransmissionIdentifier());
             logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));
@@ -66,15 +63,6 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
         }
 
         eventReporter.reportStatus(cm);
-    }
-
-    private void updateContainerMessageMetadata(ContainerMessage cm, TransmissionResponse response) {
-        if (response.getEndpoint() == null) {
-            return;
-        }
-        X509Certificate certificate = response.getEndpoint().getCertificate();
-        X500Principal principal = certificate.getSubjectX500Principal();
-        cm.getMetadata().setReceivingAccessPoint(principal.getName());
     }
 
 }
