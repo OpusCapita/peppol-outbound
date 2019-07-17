@@ -46,7 +46,7 @@ public class XIBSender implements Sender {
             throw new BusinessDeliveryException("Error occurred while trying to send the file to XIB", e);
         }
 
-        logger.info("XIBSender delivered message: " + cm.getFileName());
+        logger.debug("XIBSender delivered message: " + cm.getFileName());
         return new BusinessResponse();
     }
 

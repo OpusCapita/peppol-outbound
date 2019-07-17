@@ -36,16 +36,15 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
     @Override
     public void consume(@NotNull ContainerMessage cm) throws Exception {
         cm.setStep(ProcessStep.OUTBOUND);
+        String destination = cm.getRoute().getDestination();
         cm.getHistory().addInfo("Received and started transmission");
-        logger.info("Outbound received the message: " + cm.toKibana());
+        logger.info("Outbound received the message: " + cm.toKibana() + " destination: " + destination);
 
         if (StringUtils.isBlank(cm.getFileName())) {
             throw new IllegalArgumentException("File name is empty in received message: " + cm.toKibana());
         }
 
         try {
-            String destination = cm.getRoute().getDestination();
-            logger.info("Got destination " + destination + " for the message: " + cm.getFileName());
             Sender sender = senderFactory.getSender(cm, destination);
 
             cm.getHistory().addInfo("About to send file using: " + sender.getClass().getSimpleName());

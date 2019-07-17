@@ -62,6 +62,11 @@ public class SenderFactory {
             return a2aSender;
         }
 
+        if ("sirius".equals(destination)) {
+            logger.info("Selected to send via Sirius sender for file: " + cm.getFileName());
+            return a2aSender;
+        }
+
         logger.info("Selected to send via REAL sender for file: " + cm.getFileName());
         return realSender;
     }
