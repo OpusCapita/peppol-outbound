@@ -3,6 +3,7 @@ package com.opuscapita.peppol.outbound.sender;
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.outbound.sender.business.A2ASender;
+import com.opuscapita.peppol.outbound.sender.business.SiriusSender;
 import com.opuscapita.peppol.outbound.sender.business.XIBSender;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
 import org.slf4j.Logger;
@@ -28,15 +29,17 @@ public class SenderFactory {
 
     private A2ASender a2aSender;
     private XIBSender xibSender;
+    private SiriusSender siriusSender;
 
     private Storage storage;
     private OxalisOutboundComponent oxalis;
 
     @Autowired
-    public SenderFactory(Storage storage, A2ASender a2aSender, XIBSender xibSender) {
+    public SenderFactory(Storage storage, A2ASender a2aSender, XIBSender xibSender, SiriusSender siriusSender) {
         this.storage = storage;
         this.a2aSender = a2aSender;
         this.xibSender = xibSender;
+        this.siriusSender = siriusSender;
         this.oxalis = new OxalisOutboundComponent();
     }
 
@@ -64,11 +67,15 @@ public class SenderFactory {
 
         if ("sirius".equals(destination)) {
             logger.info("Selected to send via Sirius sender for file: " + cm.getFileName());
-            return a2aSender;
+            return siriusSender;
         }
 
-        logger.info("Selected to send via REAL sender for file: " + cm.getFileName());
-        return realSender;
+        if ("network".equals(destination)) {
+            logger.info("Selected to send via REAL sender for file: " + cm.getFileName());
+            return realSender;
+        }
+
+        throw new RuntimeException("This poor lonely document has nowhere to go!");
     }
 
 }
