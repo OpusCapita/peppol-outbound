@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -23,6 +24,7 @@ import java.io.InputStream;
 import java.util.Base64;
 
 @Component
+@RefreshScope
 public class SiriusSender implements Sender {
 
     private final static Logger logger = LoggerFactory.getLogger(SiriusSender.class);
@@ -98,7 +100,9 @@ public class SiriusSender implements Sender {
         headers.set("Process-Id", cm.getMetadata().getProfileTypeIdentifier());
         headers.set("Document-Id", cm.getMetadata().getDocumentTypeIdentifier());
         headers.set("File-Name", FilenameUtils.getName(cm.getFileName()));
-        headers.set("Transmission-Id", cm.getMetadata().getTransmissionId());
+        headers.set("Message-Id", cm.getMetadata().getMessageId());
+        headers.set("Receiver-Id", cm.getMetadata().getRecipientId());
+        headers.set("Sender-Id", cm.getMetadata().getSenderId());
         return headers;
     }
 }
