@@ -1,8 +1,8 @@
 package com.opuscapita.peppol.outbound.sender.business;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
-import com.opuscapita.peppol.commons.queue.RetryOperation;
 import com.opuscapita.peppol.commons.storage.Storage;
+import com.opuscapita.peppol.outbound.sender.RetryableSender;
 import com.opuscapita.peppol.outbound.sender.Sender;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.apache.commons.io.FilenameUtils;
@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.InputStream;
 
 @Component
-public class A2ASender implements Sender {
+public class A2ASender implements Sender, RetryableSender {
 
     private final static Logger logger = LoggerFactory.getLogger(A2ASender.class);
 
@@ -37,11 +37,11 @@ public class A2ASender implements Sender {
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
         logger.debug("A2ASender.send called for the message: " + cm.getFileName());
-        RetryOperation.start(() -> sendRequest(cm));
-        return new BusinessResponse();
+        return retrySend(cm);
     }
 
-    private void sendRequest(ContainerMessage cm) throws Exception {
+    @Override
+    public TransmissionResponse retrySend(ContainerMessage cm) throws Exception {
         logger.debug("A2ASender.sendRequest called for the message: " + cm.getFileName());
 
         try (InputStream content = storage.get(cm.getFileName())) {
@@ -61,6 +61,9 @@ public class A2ASender implements Sender {
                 throw new BusinessDeliveryException("Error occurred while trying to send the file to A2A", e);
             }
         }
+
+        logger.debug("A2ASender delivered message: " + cm.getFileName());
+        return new BusinessResponse();
     }
 
     private String getDocumentPath(ContainerMessage cm) {
@@ -77,5 +80,4 @@ public class A2ASender implements Sender {
         String filename = FilenameUtils.getName(cm.getFileName());
         return String.format("/%s/%s/%s", archetype, type, filename);
     }
-
 }

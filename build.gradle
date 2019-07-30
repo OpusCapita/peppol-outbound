@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     compile 'com.google.guava:guava:24.0-jre'
-    compile 'com.opuscapita.peppol:peppol-commons:1.0.14'
+    compile 'com.opuscapita.peppol:peppol-commons:1.0.15'
 
     compile group: 'no.difi.oxalis', name: 'oxalis-outbound', version: '4.0.2'
     compile group: 'no.difi.oxalis', name: 'oxalis-statistics', version: '4.0.2'
