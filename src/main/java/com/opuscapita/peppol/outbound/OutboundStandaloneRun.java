@@ -1,66 +1,52 @@
 package com.opuscapita.peppol.outbound;
 
-import com.opuscapita.peppol.commons.container.ContainerMessage;
-import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
-import com.opuscapita.peppol.commons.container.metadata.MetadataExtractor;
-import com.opuscapita.peppol.commons.container.state.ProcessStep;
-import com.opuscapita.peppol.commons.container.state.Source;
-import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
-import com.opuscapita.peppol.commons.storage.Storage;
-import com.opuscapita.peppol.commons.storage.StorageException;
-import com.opuscapita.peppol.commons.storage.StorageUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import no.difi.oxalis.api.outbound.TransmissionRequest;
+import no.difi.oxalis.api.outbound.TransmissionResponse;
+import no.difi.oxalis.outbound.OxalisOutboundComponent;
+import no.difi.oxalis.outbound.transmission.TransmissionRequestBuilder;
+import no.difi.vefa.peppol.common.model.Endpoint;
+import no.difi.vefa.peppol.common.model.TransportProfile;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 //@Component    // enable annotation and run, it will do the job
 public class OutboundStandaloneRun implements CommandLineRunner {
 
-    private static final String filename = "C:\\artifacts\\test\\peppol-bis.xml";
-
-    @Value("${peppol.storage.blob.hot:hot}")
-    private String hotFolder;
-
-    private Storage storage;
-    private MetadataExtractor extractor;
-    private ContainerMessageConsumer consumer;
-
-    @Autowired
-    public OutboundStandaloneRun(Storage storage, MetadataExtractor extractor, ContainerMessageConsumer consumer) {
-        this.storage = storage;
-        this.extractor = extractor;
-        this.consumer = consumer;
-    }
+    private static final String filename = "/test-material/sample-file-to-peppol.xml";
 
     @Override
     public void run(String... args) throws Exception {
-        ContainerMessage cm = initContainerMessage();
-        consumer.consume(cm);
+        OxalisOutboundComponent oxalis = new OxalisOutboundComponent();
+        TransmissionRequestBuilder requestBuilder = oxalis.getTransmissionRequestBuilder();
+        requestBuilder.setTransmissionBuilderOverride(true);
+        requestBuilder = sendRequestToGivenUrl(requestBuilder, "http://localhost:3037/public/as2");
+
+        File file = new File(getClass().getResource(filename).getFile());
+        try (InputStream payload = new FileInputStream(file)) {
+            requestBuilder.payLoad(payload);
+        }
+
+        TransmissionRequest request = requestBuilder.build();
+        TransmissionResponse response = oxalis.getTransmitter().transmit(request);
+        System.out.println(response.toString());
     }
 
-    private ContainerMessage initContainerMessage() throws Exception {
-        File file = new File(filename);
-        InputStream inputStream = new FileInputStream(file);
-
-        ContainerMessage cm = new ContainerMessage(file.getName(), Source.A2A, ProcessStep.OUTBOUND);
-        cm.getHistory().addInfo("Local received and stored");
-
-        ContainerMessageMetadata metadata = extractor.extract(inputStream);
-        cm.setMetadata(metadata);
-
-        String path = storeFile(cm, inputStream);
-        cm.setFileName(path);
-
-        return cm;
-    }
-
-    private String storeFile(ContainerMessage cm, InputStream inputStream) throws StorageException {
-        String path = hotFolder + StorageUtils.FILE_SEPARATOR + cm.getSource().name().toLowerCase();
-        path = StorageUtils.createDailyPath(path, "");
-        return storage.put(inputStream, path, cm.getFileName());
+    private TransmissionRequestBuilder sendRequestToGivenUrl(TransmissionRequestBuilder requestBuilder, String url) {
+        X509Certificate certificate = null;
+        try {
+            CertificateFactory fact = CertificateFactory.getInstance("X.509");
+            FileInputStream is = new FileInputStream("oxalis/oxalis.cer");
+            certificate = (X509Certificate) fact.generateCertificate(is);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return requestBuilder.overrideAs2Endpoint(Endpoint.of(TransportProfile.AS2_1_0, URI.create(url), certificate));
     }
 }
