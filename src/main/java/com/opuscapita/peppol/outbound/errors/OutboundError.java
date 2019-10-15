@@ -29,7 +29,7 @@ public enum OutboundError {
     /**
      * Recipient is not registered in SMP, no-retry
      */
-    UNKNOWN_RECIPIENT(false),
+    UNKNOWN_RECIPIENT(true), //making retriable because of issues in ELMA
 
     /**
      * Doc format for the recipient is not registered in SMP
@@ -82,6 +82,7 @@ public enum OutboundError {
         return OutboundError.OTHER_ERROR.equals(this) ||
                 OutboundError.SECURITY_ERROR.equals(this) ||
                 OutboundError.CONNECTION_ERROR.equals(this) ||
+                OutboundError.UNKNOWN_RECIPIENT.equals(this) ||
                 OutboundError.BP_DELIVERY_ERROR.equals(this) ||
                 OutboundError.INTERNAL_SERVICE_ERROR.equals(this) ||
                 OutboundError.RECEIVING_AP_ERROR.equals(this);
