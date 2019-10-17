@@ -85,7 +85,11 @@ public class A2AConfiguration {
         }
     }
 
-    String getAuthHeader() {
+    public String getHost() {
+        return host;
+    }
+
+    public String getAuthHeader() {
         byte[] basicAuthValue = (username + ":" + password).getBytes();
         return "Basic " + Base64.getEncoder().encodeToString(basicAuthValue);
     }

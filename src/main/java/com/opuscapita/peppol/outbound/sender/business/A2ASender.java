@@ -54,7 +54,7 @@ public class A2ASender implements Sender, RetryableSender {
             logger.debug("A2ASender wrapped and set the request body for the message: " + cm.getFileName());
 
             try {
-                ResponseEntity<String> result = restTemplate.exchange(config.host, HttpMethod.POST, entity, String.class);
+                ResponseEntity<String> result = restTemplate.exchange(config.getHost(), HttpMethod.POST, entity, String.class);
                 logger.debug("File successfully sent to A2A, got response: " + result.toString());
             } catch (Exception e) {
                 logger.error("Error occurred while trying to send the file to A2A: " + e.getMessage());
