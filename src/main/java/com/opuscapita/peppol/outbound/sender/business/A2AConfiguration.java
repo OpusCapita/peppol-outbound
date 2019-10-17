@@ -28,19 +28,22 @@ public class A2AConfiguration {
     private final static Logger logger = LoggerFactory.getLogger(A2AConfiguration.class);
 
     @Value("${a2a.host:''}")
-    String host;
+    private String host;
 
     @Value("${a2a.username:''}")
-    String username;
+    private String username;
 
     @Value("${a2a.password:''}")
-    String password;
+    private String password;
+
+    @Value("${a2a.timeout:10000}")
+    private int timeout;
 
     private RequestConfig getRequestConfig() {
         return RequestConfig.custom()
-                .setConnectionRequestTimeout(10000)
-                .setConnectTimeout(10000)
-                .setSocketTimeout(150000)
+                .setConnectionRequestTimeout(timeout)
+                .setConnectTimeout(timeout)
+                .setSocketTimeout(timeout)
                 .build();
     }
 
