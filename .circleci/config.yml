@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: ayltai/circleci-openjdk-node:jdk8-node11
+      - image: circleci/node:8
     working_directory: ~/build
     steps:
       - checkout
@@ -21,7 +21,7 @@ jobs:
           name: "prepare oxalis home directory"
           command: |
               mkdir oxalis
-              mvn org.apache.maven.plugins:maven-dependency-plugin:3.0.2:copy -Dartifact=mysql:mysql-connector-java:5.1.26:jar -DoutputDirectory=oxalis
+              wget -P oxalis -L https://raw.githubusercontent.com/OpusCapita/peppol-commons/master/lib/mysql-connector-java-5.1.26.jar
       - run:
           name: "building and testing locally"
           command: "node ../buildprocess/bp_localbuild.js opuscapita/$CIRCLE_PROJECT_REPONAME"
@@ -36,7 +36,7 @@ jobs:
 
   copy_to_env:
     docker:
-      - image: ayltai/circleci-openjdk-node:jdk8-node11
+      - image: circleci/node:8
     working_directory: ~/build
 
     steps:
@@ -52,7 +52,7 @@ jobs:
 
   build_base:
     docker:
-      - image: ayltai/circleci-openjdk-node:jdk8-node11
+      - image: circleci/node:8
     working_directory: ~/build
     steps:
       - checkout

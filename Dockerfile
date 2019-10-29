@@ -13,7 +13,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew build || return 0
 
 ## actual container
-FROM openjdk:8
+FROM openjdk:8u191-jre-alpine3.9
 LABEL author="Ibrahim Bilge <Ibrahim.Bilge@opuscapita.com>"
 
 ## setting heap size automatically to the container memory limits
@@ -26,7 +26,7 @@ COPY --from=TEMP_BUILD_IMAGE $APP_HOME/oxalis oxalis
 COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/peppol-outbound.jar .
 
 HEALTHCHECK --interval=15s --timeout=30s --start-period=40s --retries=15 \
-  CMD curl --silent --fail http://localhost:3040/api/health/check || exit 1
+  CMD wget --quiet --tries=1 --spider http://localhost:3040/api/health/check || exit 1
 
 EXPOSE 3040
 ENTRYPOINT exec java $JAVA_OPTS -jar peppol-outbound.jar
