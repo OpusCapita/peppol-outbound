@@ -67,7 +67,7 @@ public class A2AConfiguration {
 
     @Bean
     @Qualifier("a2aRestTemplate")
-    public RestTemplate restTemplate() throws Exception {
+    public RestTemplate a2aRestTemplate() throws Exception {
         try {
             CloseableHttpClient httpClient = HttpClientBuilder.create()
                     .setSSLSocketFactory(getConnectionSocketFactory())
