@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.Base64;
 
 @Component
@@ -47,7 +48,7 @@ public class SiriusSender implements Sender {
     @Autowired
     public SiriusSender(Storage storage, RestTemplateBuilder restTemplateBuilder) {
         this.storage = storage;
-        this.restTemplate = restTemplateBuilder.build();
+        this.restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofMinutes(3)).build();
     }
 
     @Override
