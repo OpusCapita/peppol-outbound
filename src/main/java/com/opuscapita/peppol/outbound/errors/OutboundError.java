@@ -52,6 +52,11 @@ public enum OutboundError {
     BP_DELIVERY_ERROR(true),
 
     /**
+     * Used as a configuration to stop delivery to a certain destination
+     */
+    STOPPED_DELIVERY_ERROR(false),
+
+    /**
      * An unexpected error occurred in our own service, probably from blob
      */
     INTERNAL_SERVICE_ERROR(true),

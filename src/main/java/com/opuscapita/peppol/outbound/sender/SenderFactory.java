@@ -21,8 +21,11 @@ public class SenderFactory {
 
     private final static Logger logger = LoggerFactory.getLogger(SenderFactory.class);
 
-    @Value("${fake-sending:}")
+    @Value("${fake-sending:''}")
     private String fakeConfig;
+
+    @Value("${stop-sending:''}")
+    private String stopConfig;
 
     private Sender fakeSender;
     private Sender realSender;
@@ -49,7 +52,11 @@ public class SenderFactory {
         this.realSender = new RealSender(storage, oxalis);
     }
 
-    public Sender getSender(ContainerMessage cm, String destination) {
+    public Sender getSender(ContainerMessage cm, String destination) throws Exception {
+        if (stopConfig.contains(destination)) {
+            throw new SenderFactoryException("Stopped delivery to " + destination + " as requested");
+        }
+
         if (fakeConfig.contains(destination)) {
             logger.info("Selected to send via FAKE sender for file: " + cm.getFileName());
             return fakeSender;

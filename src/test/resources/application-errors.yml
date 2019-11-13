@@ -34,3 +34,6 @@ peppol:
 
         - type: DOCUMENT_ERROR
           mask: "Empty file .* received by .*"
+
+        - type: STOPPED_DELIVERY_ERROR
+          mask: ".*Stopped delivery to .* as requested.*"
