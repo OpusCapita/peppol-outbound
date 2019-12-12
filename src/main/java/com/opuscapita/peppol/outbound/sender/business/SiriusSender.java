@@ -104,6 +104,7 @@ public class SiriusSender implements Sender {
         headers.set("Message-Id", cm.getMetadata().getMessageId());
         headers.set("Receiver-Id", cm.getMetadata().getRecipientId());
         headers.set("Sender-Id", cm.getMetadata().getSenderId());
+        headers.set("senderApplication", "PEPPOL-AP");
         return headers;
     }
 }

@@ -43,7 +43,7 @@
     "oc-service-user-create-override": "true"
   },
   "prod": {
-    "replicas": 3,
+    "replicas": 5,
     "limit-memory": "3000M"
   }
 }
