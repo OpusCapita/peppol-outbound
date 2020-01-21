@@ -52,7 +52,7 @@ public class SiriusConfiguration {
 
     @Bean
     @Qualifier("siriusRestTemplate")
-    public RestTemplate a2aRestTemplate() throws Exception {
+    public RestTemplate siriusRestTemplate() throws Exception {
         CloseableHttpClient httpClient = HttpClientBuilder.create()
                 .setConnectionManager(getConnectionManager())
                 .setDefaultRequestConfig(getRequestConfig())
