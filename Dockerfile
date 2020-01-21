@@ -10,7 +10,7 @@ COPY gradle $APP_HOME/gradle
 COPY . $APP_HOME
 
 RUN chmod +x ./gradlew
-RUN ./gradlew build || return 0
+RUN ./gradlew -q build || return 0
 
 ## actual container
 FROM openjdk:8

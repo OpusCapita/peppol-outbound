@@ -36,14 +36,14 @@ public class A2AConfiguration {
     @Value("${a2a.password:''}")
     private String password;
 
-    @Value("${a2a.timeout:10000}")
+    @Value("${a2a.timeout:1}")
     private int timeout;
 
     private RequestConfig getRequestConfig() {
         return RequestConfig.custom()
-                .setConnectionRequestTimeout(timeout)
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(timeout)
+                .setConnectionRequestTimeout(timeout * 60 * 1000)
+                .setConnectTimeout(timeout * 60 * 1000)
+                .setSocketTimeout(timeout * 60 * 1000)
                 .build();
     }
 
