@@ -8,8 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -21,8 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
-import java.time.Duration;
-import java.util.Base64;
 
 @Component
 @RefreshScope
@@ -30,32 +27,22 @@ public class SiriusSender implements Sender {
 
     private final static Logger logger = LoggerFactory.getLogger(SiriusSender.class);
 
-    @Value("${sirius.url:''}")
-    private String url;
-
-    @Value("${sirius.username:''}")
-    private String username;
-
-    @Value("${sirius.password:''}")
-    private String password;
-
-    @Value("${sirius.size-limit:5242880}")
-    private Long sizeLimit;
-
     private final Storage storage;
     private final RestTemplate restTemplate;
+    private final SiriusConfiguration config;
 
     @Autowired
-    public SiriusSender(Storage storage, RestTemplateBuilder restTemplateBuilder) {
+    public SiriusSender(Storage storage, @Qualifier("siriusRestTemplate") RestTemplate restTemplate, SiriusConfiguration config) {
+        this.config = config;
         this.storage = storage;
-        this.restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofMinutes(3)).build();
+        this.restTemplate = restTemplate;
     }
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
         logger.info("SiriusSender.send called for the message: " + cm.getFileName());
 
-        if (storage.size(cm.getFileName()) < sizeLimit) {
+        if (storage.size(cm.getFileName()) < config.getSizeLimit()) {
             sendFile(cm);
         } else {
             sendReference(cm);
@@ -70,7 +57,7 @@ public class SiriusSender implements Sender {
             HttpEntity<Resource> entity = new HttpEntity<>(new InputStreamResource(content), headers);
 
             try {
-                ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+                ResponseEntity<String> result = restTemplate.exchange(config.getUrl(), HttpMethod.POST, entity, String.class);
                 logger.info("File successfully sent to Sirius, got response: " + result.toString());
             } catch (Exception e) {
                 logger.error("Error occurred while trying to send the file to Sirius", e);
@@ -85,7 +72,7 @@ public class SiriusSender implements Sender {
         HttpEntity<Resource> entity = new HttpEntity<>(null, headers);
 
         try {
-            ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            ResponseEntity<String> result = restTemplate.exchange(config.getUrl(), HttpMethod.POST, entity, String.class);
             logger.info("File reference successfully sent to Sirius, got response: " + result.toString());
         } catch (Exception e) {
             logger.error("Error occurred while trying to send the file to Sirius", e);
@@ -96,7 +83,7 @@ public class SiriusSender implements Sender {
     private HttpHeaders getHeaders(ContainerMessage cm) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Transfer-Encoding", "chunked");
-        headers.set("Authorization", "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes()));
+        headers.set("Authorization", config.getAuthHeader());
         headers.set("Content-Type", "application/octet-stream");
         headers.set("Process-Id", cm.getMetadata().getProfileTypeIdentifier());
         headers.set("Document-Id", cm.getMetadata().getDocumentTypeIdentifier());
