@@ -87,7 +87,6 @@ public enum OutboundError {
         return OutboundError.OTHER_ERROR.equals(this) ||
                 OutboundError.SECURITY_ERROR.equals(this) ||
                 OutboundError.CONNECTION_ERROR.equals(this) ||
-                OutboundError.UNKNOWN_RECIPIENT.equals(this) ||
                 OutboundError.BP_DELIVERY_ERROR.equals(this) ||
                 OutboundError.INTERNAL_SERVICE_ERROR.equals(this) ||
                 OutboundError.RECEIVING_AP_ERROR.equals(this);
