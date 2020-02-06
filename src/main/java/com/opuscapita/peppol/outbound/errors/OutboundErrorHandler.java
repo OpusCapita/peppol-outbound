@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.outbound.errors;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
+import com.opuscapita.peppol.commons.container.metadata.AccessPointInfo;
 import com.opuscapita.peppol.commons.container.state.Route;
 import com.opuscapita.peppol.commons.eventing.TicketReporter;
 import com.opuscapita.peppol.commons.queue.MessageQueue;
@@ -52,7 +53,9 @@ public class OutboundErrorHandler {
             logger.info("Exception of type " + errorType + " registered as non-retriable, reporting exception for file: " + cm.getFileName());
         }
 
-        String errorMessage = errorType + ": " + exception.getMessage();
+        AccessPointInfo apInfo = cm.getApInfo();
+        String apId = apInfo != null ? "[" + apInfo.getId() + "] " : "";
+        String errorMessage = errorType + ": " + apId + exception.getMessage();
         cm.getHistory().addSendingError(errorMessage);
 
         if (errorType.requiresTicketCreation()) {
