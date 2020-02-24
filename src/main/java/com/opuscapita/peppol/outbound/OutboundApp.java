@@ -13,7 +13,6 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-@EnableAutoConfiguration
 @SpringBootApplication
 @ComponentScan({"com.opuscapita.peppol.outbound", "com.opuscapita.peppol.commons"})
 public class OutboundApp {

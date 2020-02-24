@@ -29,13 +29,13 @@ public class XIBSender implements Sender {
 
     @Override
     public TransmissionResponse send(ContainerMessage cm) throws Exception {
-        String endpoint = getEndpoint(cm.getFileName());
+        String endpoint = getEndpoint();
         logger.debug("Sending upload-file request to endpoint: " + endpoint + " for file: " + cm.getFileName());
 
         HttpHeaders headers = new HttpHeaders();
         authService.setAuthorizationHeader(headers);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>("", headers);
+        HttpEntity<String> entity = new HttpEntity<>(cm.getFileName(), headers);
         logger.debug("Wrapped and set the request body as string");
 
         try {
@@ -50,12 +50,11 @@ public class XIBSender implements Sender {
         return new BusinessResponse();
     }
 
-    private String getEndpoint(String filename) {
+    private String getEndpoint() {
         return UriComponentsBuilder
                 .fromUriString("http://peppol-xib-adaptor")
                 .port(3043)
                 .path("/api/upload-file")
-                .queryParam("path", filename)
                 .toUriString();
     }
 }
