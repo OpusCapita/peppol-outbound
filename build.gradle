@@ -23,12 +23,12 @@ repositories {
 dependencies {
     compile 'com.google.guava:guava:24.0-jre'
     compile 'org.bouncycastle:bcpkix-jdk15on:1.57'
-    compile 'com.opuscapita.peppol:peppol-commons:1.0.27'
+    compile 'com.opuscapita.peppol:peppol-commons:1.0.26'
 
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile group: 'no.difi.oxalis', name: 'oxalis-outbound', version: '4.1.2'
-    compile group: 'no.difi.oxalis', name: 'oxalis-statistics', version: '4.1.2'
+    compile group: 'no.difi.oxalis', name: 'oxalis-outbound', version: '4.1.1'
+    compile group: 'no.difi.oxalis', name: 'oxalis-statistics', version: '4.1.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.springframework.boot:spring-boot-starter-test:2.1.0.RELEASE'
