@@ -10,7 +10,11 @@
       "SERVICE_NAME=${serviceName}",
       "SERVICE_3040_CHECK_HTTP=/api/health/check",
       "SERVICE_3040_CHECK_INTERVAL=15s",
-      "SERVICE_3040_CHECK_TIMEOUT=3s"
+      "SERVICE_3040_CHECK_TIMEOUT=3s",
+      "OXALIS_DB_USER=${OXALIS_DB_USER}",
+      "OXALIS_DB_PASS=${OXALIS_DB_PASS}",
+      "OXALIS_READ_TIMEOUT=${OXALIS_READ_TIMEOUT}",
+      "OXALIS_KEYSTORE_PASS=${OXALIS_KEYSTORE_PASS}"
     ],
     "oc-consul-injection": {
       "redis/password": "${SECRET_:env_REDIS}",
