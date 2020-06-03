@@ -10,8 +10,7 @@
       "SERVICE_NAME=${serviceName}",
       "SERVICE_3040_CHECK_HTTP=/api/health/check",
       "SERVICE_3040_CHECK_INTERVAL=15s",
-      "SERVICE_3040_CHECK_TIMEOUT=3s",
-      "OXALIS_HOME=/run/secrets"
+      "SERVICE_3040_CHECK_TIMEOUT=3s"
     ],
     "oc-consul-injection": {
       "redis/password": "${SECRET_:env_REDIS}",
@@ -35,8 +34,7 @@
       "snc/businessGroup": "Itella Information"
     },
     "oc-secret-injection": {
-      "oxalis-keystore.jks": {"type": "binary", "encoding": "base64", "value": "${PEPPOL_:env_KEYSTORE}"},
-      "oxalis.conf": {"encoding": "base64", "value": "${PEPPOL_:env_OXALIS}"}
+      "oxalis-keystore.jks": {"type": "binary", "encoding": "base64", "value": "${PEPPOL_:env_KEYSTORE}"}
     },
     "limit-memory": "900M",
     "reserve-memory": "300M",
@@ -44,6 +42,6 @@
   },
   "prod": {
     "replicas": 5,
-    "limit-memory": "2000M"
+    "limit-memory": "1200M"
   }
 }

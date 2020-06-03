@@ -73,24 +73,9 @@ public class OutboundApp {
      * This is the workaround to inject keys since compose secrets failed.
      */
     private static void prepareOxalisHomeDirectory() throws IOException {
-        String oxalisHome = System.getenv("OXALIS_HOME");
-        if (StringUtils.isBlank(oxalisHome)) {
-            return;
-        }
-
-        String conf = System.getenv("OXALIS_CONF");
         String cert = System.getenv("OXALIS_CERT");
-
-        if (StringUtils.isNotBlank(conf)) {
-            String key = "oxalis.database.jdbc.password";
-
-            File file = new File(oxalisHome + "/oxalis.conf");
-            InputStream content = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(conf));
-            InputStream updated = FileUpdateUtils.startAndReplace(content, key, key + "=test");
-            FileUtils.copyInputStreamToFile(updated, file);
-        }
         if (StringUtils.isNotBlank(cert)) {
-            File file = new File(oxalisHome + "/oxalis-keystore.jks");
+            File file = new File("/run/secrets/oxalis-keystore.jks");
             FileUtils.writeByteArrayToFile(file, DatatypeConverter.parseBase64Binary(cert));
         }
     }
