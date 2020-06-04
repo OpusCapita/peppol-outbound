@@ -39,7 +39,7 @@ public class OutboundApp {
 
     public static void main(String[] args) {
         try {
-            prepareOxalisHomeDirectory();
+            prepareKeystore();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,12 +68,9 @@ public class OutboundApp {
         return new Queue(queueIn);
     }
 
-    /**
-     * A bit tricky thing, Local build and testing uses docker compose
-     * This is the workaround to inject keys since compose secrets failed.
-     */
-    private static void prepareOxalisHomeDirectory() throws IOException {
-        String cert = System.getenv("OXALIS_CERT");
+    // This is the workaround to inject key for compose since we use docker secrets
+    private static void prepareKeystore() throws IOException {
+        String cert = System.getenv("PEPPOL_KEYSTORE");
         if (StringUtils.isNotBlank(cert)) {
             File file = new File("/run/secrets/oxalis-keystore.jks");
             FileUtils.writeByteArrayToFile(file, DatatypeConverter.parseBase64Binary(cert));
