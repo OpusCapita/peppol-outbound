@@ -4,7 +4,6 @@ import com.google.inject.Injector;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
 import no.difi.vefa.peppol.common.model.*;
 import no.difi.vefa.peppol.lookup.LookupClient;
-import no.difi.vefa.peppol.lookup.api.LookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,38 +21,48 @@ public class OutboundRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(OutboundRestController.class);
 
-    @GetMapping("/public/lookup/{icd}/{identifier}")
-    public ResponseEntity<?> lookupParticipant(@PathVariable String icd, @PathVariable String identifier) throws Exception {
+    private LookupClient lookupClient;
+
+    public OutboundRestController() {
         OxalisOutboundComponent oxalis = new OxalisOutboundComponent();
         Injector injector = oxalis.getInjector();
-        LookupClient lookupClient = injector.getInstance(LookupClient.class);
+        this.lookupClient = injector.getInstance(LookupClient.class);
+    }
 
+    @GetMapping("/public/lookup/{icd}/{identifier}")
+    public ResponseEntity<?> lookupParticipant(@PathVariable String icd, @PathVariable String identifier) throws Exception {
         try {
-            ParticipantIdentifier p = ParticipantIdentifier.of(icd + ":" + identifier);
-            logger.info("Sending lookup request for " + p.toString());
-            List<ServiceReference> serviceReferences = lookupClient.getServiceReferences(p);
+            ParticipantIdentifier participantIdentifier = ParticipantIdentifier.of(icd + ":" + identifier);
+            logger.info("Sending lookup request for " + participantIdentifier.toString());
+            LookupResponseDto response = new LookupResponseDto(participantIdentifier);
 
-            List<ServiceMetadata> metadataList = new ArrayList<>();
+            List<ServiceReference> serviceReferences = lookupClient.getServiceReferences(participantIdentifier);
             for (ServiceReference serviceReference : serviceReferences) {
-                ServiceMetadata metadata = lookupClient.getServiceMetadata(p, serviceReference.getDocumentTypeIdentifier());
-
-                logger.info("   DocumentTypeIdentifier = " + metadata.getDocumentTypeIdentifier().toString());
+                ServiceMetadata metadata = lookupClient.getServiceMetadata(participantIdentifier, serviceReference.getDocumentTypeIdentifier());
                 for (ProcessMetadata<Endpoint> processMetadata : metadata.getProcesses()) {
 
-                    for (ProcessIdentifier processIdentifier : processMetadata.getProcessIdentifier()) {
-                        logger.info("      ProcessIdentifier = " + processIdentifier.toString());
-                    }
+                    LookupResponseDocumentTypeDto responseDocumentType = new LookupResponseDocumentTypeDto(metadata.getDocumentTypeIdentifier());
+                    responseDocumentType.setProcessIdentifier(processMetadata.getProcessIdentifier() != null && !processMetadata.getProcessIdentifier().isEmpty() ? processMetadata.getProcessIdentifier().get(0) : null);
+
                     for (Endpoint endpoint : processMetadata.getEndpoints()) {
-                        logger.info("      Endpoint = " + endpoint.toString());
+                        LookupResponseEndpointDto responseEndpoint = new LookupResponseEndpointDto();
+                        responseEndpoint.setAddress(endpoint.getAddress().toASCIIString());
+                        responseEndpoint.setTransportProfile(endpoint.getTransportProfile().getIdentifier());
+                        responseEndpoint.setCertificateSubject(endpoint.getCertificate().getSubjectX500Principal().getName());
+                        responseEndpoint.setCertificateValidityStartDate(endpoint.getCertificate().getNotBefore());
+                        responseEndpoint.setCertificateValidityEndDate(endpoint.getCertificate().getNotAfter());
+
+                        responseDocumentType.getEndpointList().add(responseEndpoint);
                     }
+                    response.getDocumentTypeList().add(responseDocumentType);
                 }
-                metadataList.add(metadata);
             }
+            return wrap(response);
 
-            return wrap(metadataList);
-
-        } catch (LookupException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(e.getMessage());
+        } catch (Exception e) {
+            LookupResponseDto response = new LookupResponseDto();
+            response.setErrorMessage(e.getMessage());
+            return wrap(response);
         }
     }
 
