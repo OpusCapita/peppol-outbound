@@ -2,6 +2,7 @@ package com.opuscapita.peppol.outbound.consumer;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.eventing.EventReporter;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.outbound.errors.OutboundErrorHandler;
@@ -36,7 +37,7 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
     @Override
     public void consume(@NotNull ContainerMessage cm) throws Exception {
         cm.setStep(ProcessStep.OUTBOUND);
-        String destination = cm.getRoute().getDestination();
+        Source destination = cm.getRoute().getDestination();
         cm.getHistory().addInfo("Received and started transmission");
         logger.info("Outbound received the message: " + cm.toKibana() + " destination: " + destination);
 

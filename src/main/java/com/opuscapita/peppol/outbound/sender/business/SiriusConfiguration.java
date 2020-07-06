@@ -35,11 +35,17 @@ public class SiriusConfiguration {
     @Value("${sirius.timeout:3}")
     private int timeout;
 
+    @Value("${sirius.retry-count:10}")
+    private int retryCount;
+
+    @Value("${sirius.retry-delay:1200000}")
+    private int retryDelay;
+
     private RequestConfig getRequestConfig() {
         return RequestConfig.custom()
-                .setConnectionRequestTimeout(timeout * 60  * 1000)
-                .setConnectTimeout(timeout * 60  * 1000)
-                .setSocketTimeout(timeout * 60  * 1000)
+                .setConnectionRequestTimeout(timeout * 60 * 1000)
+                .setConnectTimeout(timeout * 60 * 1000)
+                .setSocketTimeout(timeout * 60 * 1000)
                 .build();
     }
 
@@ -74,5 +80,13 @@ public class SiriusConfiguration {
     public String getAuthHeader() {
         byte[] basicAuthValue = (username + ":" + password).getBytes();
         return "Basic " + Base64.getEncoder().encodeToString(basicAuthValue);
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public int getRetryDelay() {
+        return retryDelay;
     }
 }
