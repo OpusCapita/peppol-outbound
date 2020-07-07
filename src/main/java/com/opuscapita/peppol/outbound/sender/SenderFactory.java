@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.outbound.sender;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.outbound.sender.business.A2ASender;
 import com.opuscapita.peppol.outbound.sender.business.SiriusSender;
@@ -28,61 +29,65 @@ public class SenderFactory {
     private String stopConfig;
 
     private Sender fakeSender;
-    private Sender realSender;
-
+    private Sender networkSender;
     private A2ASender a2aSender;
     private XIBSender xibSender;
     private SiriusSender siriusSender;
+    private NetworkConfiguration networkConfiguration;
 
     private Storage storage;
     private OxalisOutboundComponent oxalis;
 
     @Autowired
-    public SenderFactory(Storage storage, A2ASender a2aSender, XIBSender xibSender, SiriusSender siriusSender) {
+    public SenderFactory(Storage storage, A2ASender a2aSender, XIBSender xibSender, SiriusSender siriusSender,
+                         NetworkConfiguration networkConfiguration) {
         this.storage = storage;
         this.a2aSender = a2aSender;
         this.xibSender = xibSender;
         this.siriusSender = siriusSender;
+        this.networkConfiguration = networkConfiguration;
         this.oxalis = new OxalisOutboundComponent();
     }
 
     @PostConstruct
     public void initSenders() {
         this.fakeSender = new FakeSender();
-        this.realSender = new RealSender(storage, oxalis);
+        this.networkSender = new NetworkSender(storage, networkConfiguration, oxalis);
     }
 
-    public Sender getSender(ContainerMessage cm, String destination) throws Exception {
-        if (stopConfig.contains(destination)) {
+    public Sender getSender(ContainerMessage cm, Source destination) throws Exception {
+        if (stopConfig.contains(destination.name())) {
             throw new SenderFactoryException("Stopped delivery to " + destination + " as requested");
         }
 
-        if (fakeConfig.contains(destination)) {
+        if (fakeConfig.contains(destination.name())) {
             logger.info("Selected to send via FAKE sender for file: " + cm.getFileName());
             return fakeSender;
         }
 
-        if ("xib".equals(destination)) {
-            logger.info("Selected to send via XIB sender for file: " + cm.getFileName());
-            return xibSender;
+        Sender sender;
+        switch (destination) {
+            case NETWORK:
+                sender = networkSender;
+                break;
+            case SIRIUS:
+                sender = siriusSender;
+                break;
+            case XIB:
+                sender = xibSender;
+                break;
+            case A2A:
+                sender = a2aSender;
+                break;
+            default:
+                throw new RuntimeException("This poor lonely document has nowhere to go!");
         }
 
-        if ("a2a".equals(destination)) {
-            logger.info("Selected to send via A2A sender for file: " + cm.getFileName());
-            return a2aSender;
+        if (cm.getRoute().getCurrent() == -1) {
+            cm.getRoute().initiate(sender.getRetryCount(), sender.getRetryDelay());
         }
 
-        if ("sirius".equals(destination)) {
-            logger.info("Selected to send via Sirius sender for file: " + cm.getFileName());
-            return siriusSender;
-        }
-
-        if ("network".equals(destination)) {
-            logger.info("Selected to send via REAL sender for file: " + cm.getFileName());
-            return realSender;
-        }
-
-        throw new RuntimeException("This poor lonely document has nowhere to go!");
+        return sender;
     }
 
 }

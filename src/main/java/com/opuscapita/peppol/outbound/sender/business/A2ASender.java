@@ -80,4 +80,14 @@ public class A2ASender implements Sender, RetryableSender {
         String filename = FilenameUtils.getName(cm.getFileName());
         return String.format("/%s/%s/%s", archetype, type, filename);
     }
+
+    @Override
+    public int getRetryCount() {
+        return config.getRetryCount();
+    }
+
+    @Override
+    public int getRetryDelay() {
+        return config.getRetryDelay();
+    }
 }

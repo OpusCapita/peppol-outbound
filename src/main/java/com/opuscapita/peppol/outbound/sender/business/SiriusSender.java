@@ -94,4 +94,14 @@ public class SiriusSender implements Sender {
         headers.set("senderApplication", "PEPPOL-AP");
         return headers;
     }
+
+    @Override
+    public int getRetryCount() {
+        return config.getRetryCount();
+    }
+
+    @Override
+    public int getRetryDelay() {
+        return config.getRetryDelay();
+    }
 }

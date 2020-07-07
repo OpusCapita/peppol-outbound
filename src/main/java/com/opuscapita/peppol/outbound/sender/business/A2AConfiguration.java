@@ -39,6 +39,12 @@ public class A2AConfiguration {
     @Value("${a2a.timeout:10000}")
     private int timeout;
 
+    @Value("${a2a.retry-count:30}")
+    private int retryCount;
+
+    @Value("${a2a.retry-delay:1200000}")
+    private int retryDelay;
+
     private RequestConfig getRequestConfig() {
         return RequestConfig.custom()
                 .setConnectionRequestTimeout(timeout)
@@ -92,5 +98,13 @@ public class A2AConfiguration {
     public String getAuthHeader() {
         byte[] basicAuthValue = (username + ":" + password).getBytes();
         return "Basic " + Base64.getEncoder().encodeToString(basicAuthValue);
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public int getRetryDelay() {
+        return retryDelay;
     }
 }
