@@ -23,7 +23,7 @@ repositories {
 dependencies {
     compile 'com.google.guava:guava:24.0-jre'
     compile 'org.bouncycastle:bcpkix-jdk15on:1.57'
-    compile 'com.opuscapita.peppol:peppol-commons:1.0.29'
+    compile 'com.opuscapita.peppol:peppol-commons:1.0.30'
 
     compile fileTree(include: ['*.jar'], dir: 'libs')
 

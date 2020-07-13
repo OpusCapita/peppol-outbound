@@ -1,7 +1,8 @@
-package com.opuscapita.peppol.outbound.sender;
+package com.opuscapita.peppol.outbound.sender.network;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
+import com.opuscapita.peppol.outbound.sender.Sender;
 import no.difi.oxalis.api.outbound.TransmissionRequest;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import no.difi.oxalis.outbound.OxalisOutboundComponent;
@@ -19,7 +20,7 @@ public class NetworkSender implements Sender {
     private final NetworkConfiguration config;
     private final OxalisOutboundComponent oxalis;
 
-    NetworkSender(Storage storage, NetworkConfiguration networkConfiguration, OxalisOutboundComponent oxalis) {
+    public NetworkSender(Storage storage, NetworkConfiguration networkConfiguration, OxalisOutboundComponent oxalis) {
         this.oxalis = oxalis;
         this.storage = storage;
         this.config = networkConfiguration;
