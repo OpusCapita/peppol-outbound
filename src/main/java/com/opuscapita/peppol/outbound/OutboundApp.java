@@ -2,7 +2,6 @@ package com.opuscapita.peppol.outbound;
 
 import com.opuscapita.peppol.commons.queue.consume.CommonMessageReceiver;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
-import com.opuscapita.peppol.outbound.util.FileUpdateUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 @SpringBootApplication
 @ComponentScan({"com.opuscapita.peppol.outbound", "com.opuscapita.peppol.commons"})

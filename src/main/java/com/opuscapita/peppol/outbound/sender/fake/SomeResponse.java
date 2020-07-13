@@ -1,4 +1,4 @@
-package com.opuscapita.peppol.outbound.sender.fakes;
+package com.opuscapita.peppol.outbound.sender.fake;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import no.difi.oxalis.api.model.TransmissionIdentifier;

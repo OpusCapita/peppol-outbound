@@ -1,8 +1,10 @@
-package com.opuscapita.peppol.outbound.sender.business;
+package com.opuscapita.peppol.outbound.sender.business.xib;
 
 import com.opuscapita.peppol.commons.auth.AuthorizationService;
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.outbound.sender.Sender;
+import com.opuscapita.peppol.outbound.sender.business.BusinessDeliveryException;
+import com.opuscapita.peppol.outbound.sender.business.BusinessResponse;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
