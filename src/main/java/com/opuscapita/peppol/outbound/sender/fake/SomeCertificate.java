@@ -1,4 +1,4 @@
-package com.opuscapita.peppol.outbound.sender.fakes;
+package com.opuscapita.peppol.outbound.sender.fake;
 
 import javax.security.auth.x500.X500Principal;
 import java.math.BigInteger;

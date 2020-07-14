@@ -1,4 +1,4 @@
-package com.opuscapita.peppol.outbound.sender.business;
+package com.opuscapita.peppol.outbound.sender.business.a2a;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -23,6 +24,7 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 
 @Configuration
+@RefreshScope
 public class A2AConfiguration {
 
     private final static Logger logger = LoggerFactory.getLogger(A2AConfiguration.class);
@@ -38,6 +40,12 @@ public class A2AConfiguration {
 
     @Value("${a2a.timeout:10000}")
     private int timeout;
+
+    @Value("${a2a.retry-count:30}")
+    private int retryCount;
+
+    @Value("${a2a.retry-delay:1200000}")
+    private int retryDelay;
 
     private RequestConfig getRequestConfig() {
         return RequestConfig.custom()
@@ -92,5 +100,13 @@ public class A2AConfiguration {
     public String getAuthHeader() {
         byte[] basicAuthValue = (username + ":" + password).getBytes();
         return "Basic " + Base64.getEncoder().encodeToString(basicAuthValue);
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public int getRetryDelay() {
+        return retryDelay;
     }
 }

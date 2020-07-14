@@ -5,6 +5,8 @@ import com.opuscapita.peppol.commons.container.metadata.AccessPointInfo;
 import com.opuscapita.peppol.commons.container.state.Route;
 import com.opuscapita.peppol.commons.eventing.TicketReporter;
 import com.opuscapita.peppol.commons.queue.MessageQueue;
+import com.opuscapita.peppol.outbound.sender.Sender;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,20 +38,22 @@ public class OutboundErrorHandler {
         this.errorRecognizer = errorRecognizer;
     }
 
-    public void handle(ContainerMessage cm, Exception exception) {
+    public void handle(ContainerMessage cm, @Nullable Sender sender, Exception exception) {
         OutboundError errorType = errorRecognizer.recognize(exception);
+        logger.warn("Sending of the message " + cm.getFileName() + " failed with " + errorType);
 
-        if (errorType.isRetryable()) {
+        if (errorType.isRetryable() && sender != null) {
             Route route = cm.getRoute();
-            if (route.incrementAndGetCurrent() <= route.getRetry()) {
+            if (route.incrementAndGetRetryCount() <= sender.getRetryCount()) {
                 cm.getHistory().addInfo("Sent to outbound retry queue");
                 logger.info("The message " + cm.getFileName() + " sent to retry queue");
-                sendToRetry(cm, route.getDelay());
+                sendToRetry(cm, sender.getRetryDelay());
                 return;
             }
 
             logger.info("No (more) retries possible, reporting exception for file: " + cm.getFileName());
-        } else {
+
+        } else if (!errorType.isRetryable()) {
             logger.info("Exception of type " + errorType + " registered as non-retriable, reporting exception for file: " + cm.getFileName());
         }
 

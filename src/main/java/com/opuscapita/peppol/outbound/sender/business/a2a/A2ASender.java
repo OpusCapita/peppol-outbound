@@ -1,9 +1,10 @@
-package com.opuscapita.peppol.outbound.sender.business;
+package com.opuscapita.peppol.outbound.sender.business.a2a;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
-import com.opuscapita.peppol.outbound.sender.RetryableSender;
 import com.opuscapita.peppol.outbound.sender.Sender;
+import com.opuscapita.peppol.outbound.sender.business.BusinessDeliveryException;
+import com.opuscapita.peppol.outbound.sender.business.BusinessResponse;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.InputStream;
 
 @Component
-public class A2ASender implements Sender, RetryableSender {
+public class A2ASender implements Sender, IA2ASender {
 
     private final static Logger logger = LoggerFactory.getLogger(A2ASender.class);
 
@@ -79,5 +80,15 @@ public class A2ASender implements Sender, RetryableSender {
         String type = cm.getMetadata().getValidationRule().getLocalName();
         String filename = FilenameUtils.getName(cm.getFileName());
         return String.format("/%s/%s/%s", archetype, type, filename);
+    }
+
+    @Override
+    public int getRetryCount() {
+        return config.getRetryCount();
+    }
+
+    @Override
+    public int getRetryDelay() {
+        return config.getRetryDelay();
     }
 }

@@ -1,4 +1,4 @@
-package com.opuscapita.peppol.outbound.sender.business;
+package com.opuscapita.peppol.outbound.sender.business.sirius;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Base64;
 
 @Configuration
+@RefreshScope
 public class SiriusConfiguration {
 
     private final static Logger logger = LoggerFactory.getLogger(SiriusConfiguration.class);
@@ -35,11 +37,17 @@ public class SiriusConfiguration {
     @Value("${sirius.timeout:3}")
     private int timeout;
 
+    @Value("${sirius.retry-count:10}")
+    private int retryCount;
+
+    @Value("${sirius.retry-delay:1200000}")
+    private int retryDelay;
+
     private RequestConfig getRequestConfig() {
         return RequestConfig.custom()
-                .setConnectionRequestTimeout(timeout * 60  * 1000)
-                .setConnectTimeout(timeout * 60  * 1000)
-                .setSocketTimeout(timeout * 60  * 1000)
+                .setConnectionRequestTimeout(timeout * 60 * 1000)
+                .setConnectTimeout(timeout * 60 * 1000)
+                .setSocketTimeout(timeout * 60 * 1000)
                 .build();
     }
 
@@ -74,5 +82,13 @@ public class SiriusConfiguration {
     public String getAuthHeader() {
         byte[] basicAuthValue = (username + ":" + password).getBytes();
         return "Basic " + Base64.getEncoder().encodeToString(basicAuthValue);
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public int getRetryDelay() {
+        return retryDelay;
     }
 }

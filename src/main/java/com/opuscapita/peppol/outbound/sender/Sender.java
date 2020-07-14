@@ -12,4 +12,12 @@ public interface Sender {
 
     TransmissionResponse send(ContainerMessage cm) throws Exception;
 
+    default int getRetryCount() {
+        return 0;
+    }
+
+    default int getRetryDelay() {
+        return 100000;
+    }
+
 }

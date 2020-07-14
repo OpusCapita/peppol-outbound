@@ -11,7 +11,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Return this after sending file to A2A and XIB
+ * Return this after sending file to BusinessPlatforms
+ * purpose: to have a common handling with NETWORK
  */
 public class BusinessResponse implements TransmissionResponse {
 

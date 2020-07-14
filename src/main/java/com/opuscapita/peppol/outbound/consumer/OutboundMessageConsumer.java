@@ -2,6 +2,7 @@ package com.opuscapita.peppol.outbound.consumer;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.eventing.EventReporter;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.outbound.errors.OutboundErrorHandler;
@@ -36,7 +37,7 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
     @Override
     public void consume(@NotNull ContainerMessage cm) throws Exception {
         cm.setStep(ProcessStep.OUTBOUND);
-        String destination = cm.getRoute().getDestination();
+        Source destination = cm.getRoute().getDestination();
         cm.getHistory().addInfo("Received and started transmission");
         logger.info("Outbound received the message: " + cm.toKibana() + " destination: " + destination);
 
@@ -44,21 +45,21 @@ public class OutboundMessageConsumer implements ContainerMessageConsumer {
             throw new IllegalArgumentException("File name is empty in received message: " + cm.toKibana());
         }
 
+        Sender sender = null;
         try {
-            Sender sender = senderFactory.getSender(cm, destination);
-
+            sender = senderFactory.getSender(cm, destination);
             cm.getHistory().addInfo("About to send file using: " + sender.getClass().getSimpleName());
+
             TransmissionResponse response = sender.send(cm);
 
-            cm.setStep(ProcessStep.NETWORK);
+            cm.setStep(ProcessStep.NETWORK); // a virtual step, shows that it is delivered out
             cm.getHistory().addInfo("Successfully delivered to " + destination);
             logger.info("The message " + cm.toKibana() + " successfully delivered to " + destination + " with transmission ID = " + response.getTransmissionIdentifier());
             logger.debug("MDN Receipt(s) for " + cm.getFileName() + " is = " + response.getReceipts().stream().map(r -> new String(r.getValue())).collect(Collectors.joining(", ")));
 
         } catch (Exception exception) {
             cm.getHistory().addInfo("Message delivery failed");
-            logger.warn("Sending of the message " + cm.getFileName() + " failed with " + exception.getClass().getSimpleName());
-            errorHandler.handle(cm, exception);
+            errorHandler.handle(cm, sender, exception);
         }
 
         eventReporter.reportStatus(cm);

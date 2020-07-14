@@ -1,15 +1,16 @@
-package com.opuscapita.peppol.outbound.sender.business;
+package com.opuscapita.peppol.outbound.sender.business.sirius;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.outbound.sender.Sender;
+import com.opuscapita.peppol.outbound.sender.business.BusinessDeliveryException;
+import com.opuscapita.peppol.outbound.sender.business.BusinessResponse;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -22,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.InputStream;
 
 @Component
-@RefreshScope
 public class SiriusSender implements Sender {
 
     private final static Logger logger = LoggerFactory.getLogger(SiriusSender.class);
@@ -93,5 +93,15 @@ public class SiriusSender implements Sender {
         headers.set("Sender-Id", cm.getMetadata().getSenderId());
         headers.set("senderApplication", "PEPPOL-AP");
         return headers;
+    }
+
+    @Override
+    public int getRetryCount() {
+        return config.getRetryCount();
+    }
+
+    @Override
+    public int getRetryDelay() {
+        return config.getRetryDelay();
     }
 }

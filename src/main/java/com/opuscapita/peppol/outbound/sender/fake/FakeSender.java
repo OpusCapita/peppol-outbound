@@ -1,7 +1,7 @@
-package com.opuscapita.peppol.outbound.sender;
+package com.opuscapita.peppol.outbound.sender.fake;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
-import com.opuscapita.peppol.outbound.sender.fakes.SomeResponse;
+import com.opuscapita.peppol.outbound.sender.Sender;
 import no.difi.oxalis.api.outbound.TransmissionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
