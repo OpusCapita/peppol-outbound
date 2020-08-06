@@ -69,7 +69,7 @@ public class OutboundApp {
     private static void prepareKeystore() throws IOException {
         String cert = System.getenv("PEPPOL_KEYSTORE");
         if (StringUtils.isNotBlank(cert)) {
-            File file = new File("/run/secrets/oxalis-keystore.jks");
+            File file = new File("/run/secrets/oxalis-keystore-07082020.jks");
             FileUtils.writeByteArrayToFile(file, DatatypeConverter.parseBase64Binary(cert));
         }
     }
