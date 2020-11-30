@@ -4,13 +4,21 @@
     "log-driver": "gelf",
     "log-opt": ["gelf-address=udp://localhost:12201", "tag=\"${serviceName}\""],
     "constraint": ["engine.labels.nodetype==worker"],
-    "publish": ["mode=host,target=3040,published=3040,protocol=tcp"],
+    "publish": [
+      "mode=host,target=3040,published=3040,protocol=tcp",
+      "mode=host,target=3063,published=3063,protocol=tcp"
+    ],
     "host": ["consul:172.17.0.1"],
     "env": [
       "SERVICE_NAME=${serviceName}",
+      "SERVICE_3040_NAME=${serviceName}",
       "SERVICE_3040_CHECK_HTTP=/api/health/check",
       "SERVICE_3040_CHECK_INTERVAL=15s",
       "SERVICE_3040_CHECK_TIMEOUT=3s",
+      "SERVICE_3063_NAME=${serviceName}-exporter",
+      "SERVICE_3063_CHECK_TCP=true",
+      "SERVICE_3063_CHECK_INTERVAL=15s",
+      "SERVICE_3063_CHECK_TIMEOUT=3s",
       "OXALIS_DB_USER=${PEPPOL_:env_DBUSER}",
       "OXALIS_DB_PASS=${PEPPOL_:env_DBPASS}",
       "PEPPOL_KEYSTORE_PASS=${PEPPOL_:env_KEYSTOREPASS}"
@@ -40,11 +48,11 @@
       "oxalis-keystore-07082020.jks": {"type": "binary", "encoding": "base64", "value": "${PEPPOL_:env_KEYSTORE}"}
     },
     "limit-memory": "900M",
-    "reserve-memory": "300M",
+    "reserve-memory": "900M",
     "oc-service-user-create-override": "true"
   },
   "prod": {
     "replicas": 5,
-    "limit-memory": "1200M"
+    "limit-memory": "3500M"
   }
 }
